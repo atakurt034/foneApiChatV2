@@ -5,15 +5,14 @@ import Chat from './models/chat.js'
 import user from './routes/user.js'
 
 import http from 'http'
-import { Server } from 'socket.io'
+import * as io from 'socket.io'
 
 const app = express()
-const server = http.Server(app)
-const client = new Server(server)
+const server = http.createServer(app)
+const client = new io.Server(server)
 
 dotenv.config()
 client.use(user)
-client.listen(process.env.PORT)
 
 // Connect to mongo
 const connectDB = async () => {
@@ -71,3 +70,8 @@ client.on('connection', function (socket) {
     })
   })
 })
+
+app.listen(
+  process.env.PORT,
+  console.log(`connected on port ${process.env.PORT}`)
+)
