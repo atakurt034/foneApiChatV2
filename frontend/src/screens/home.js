@@ -1,6 +1,7 @@
-import { Container } from '@material-ui/core'
+import { Button, Container, Typography } from '@material-ui/core'
 import React, { useState, useEffect } from 'react'
 import { io } from 'socket.io-client'
+import { Link } from 'react-router-dom'
 const ENDPOINT = 'http://127.0.0.1:5000'
 
 export const Home = () => {
@@ -28,6 +29,10 @@ export const Home = () => {
 
   return (
     <Container>
+      <Typography variant='h1'>CHAT APP</Typography>
+      <Link to='/login'>
+        <Button>Login</Button>
+      </Link>
       <div
         readOnly
         style={{
@@ -50,15 +55,23 @@ export const Home = () => {
           padding: 10,
         }}
       >
+        <label htmlFor='name'>Name</label>
         <div>
-          <label htmlFor='name'>Name</label>
           <input type='text' name='name' onChange={changeHandler} />
         </div>
+        <label htmlFor='message'>message</label>
         <div>
-          <label htmlFor='message'>message</label>
-          <input type='text' name='message' onChange={changeHandler} />
+          <input
+            type='text'
+            name='message'
+            onChange={changeHandler}
+            style={{ height: '10vh', width: '50%' }}
+          />
         </div>
-        <button style={{ width: '10vw' }} type='submit'>
+        <button
+          style={{ width: '10vw', padding: 10, margin: 10 }}
+          type='submit'
+        >
           Send
         </button>
       </form>
