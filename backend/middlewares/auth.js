@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import User from '../models/user.js'
 import asyncHandler from 'express-async-handler'
 
-const protect = asyncHandler(async (req, res, next) => {
+export const protect = asyncHandler(async (req, res, next) => {
   let token
 
   if (
@@ -28,5 +28,3 @@ const protect = asyncHandler(async (req, res, next) => {
     throw new Error('Not authorized, no token')
   }
 })
-
-export { protect }

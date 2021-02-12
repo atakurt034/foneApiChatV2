@@ -28,28 +28,22 @@ const authUser = asyncHandler(async (req, res) => {
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
-  const valError = validationResult(req)
 
-  if (!valError.isEmpty()) {
-    res.status(422)
-    throw new Error(valError.array().map((result) => result.msg))
-  } else {
-    const user = await User.create({
-      name,
-      email,
-      password,
+  const user = await User.create({
+    name,
+    email,
+    password,
+  })
+
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      image: user.image,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      token: generateToken(user._id),
     })
-
-    if (user) {
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        image: user.image,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        token: generateToken(user._id),
-      })
-    }
   }
 })
 

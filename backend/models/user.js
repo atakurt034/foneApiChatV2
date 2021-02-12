@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
+    chatrooms: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Chatroom',
+      },
+    ],
   },
   {
     timestamps: true,

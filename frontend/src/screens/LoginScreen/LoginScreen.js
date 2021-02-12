@@ -8,6 +8,7 @@ import {
   CssBaseline,
   FormControlLabel,
   Grid,
+  Paper,
   TextField,
   Typography,
 } from '@material-ui/core'
@@ -15,21 +16,37 @@ import {
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import { useStyles } from './lsStyle'
 
-export const LoginScreen = () => {
+import { useSelector, useDispatch } from 'react-redux'
+import { UA } from '../../actions/index'
+import { ModalLoader } from '../../components/ModalLoader'
+
+export const LoginScreen = ({ history }) => {
+  const dispatch = useDispatch()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const userLogin = useSelector((state) => state.userLogin)
+  const { userInfo, loading } = userLogin
+
+  React.useEffect(() => {
+    if (userInfo && !loading) {
+      history.push('/')
+    }
+  }, [history, userInfo, loading])
+
   const submitHandler = (e) => {
     e.preventDefault()
+    dispatch(UA.login({ email, password }))
   }
 
   const classes = useStyles()
 
-  return (
-    <Container component='main' maxWidth='xs'>
+  return loading ? (
+    <ModalLoader />
+  ) : (
+    <Container component='div' maxWidth='sm'>
       <CssBaseline />
-
-      <div className={classes.paper}>
+      <Paper elevation={12} className={classes.paper}>
         <Typography
           className={classes.icon}
           gutterBottom
@@ -98,7 +115,7 @@ export const LoginScreen = () => {
             </Grid>
           </Grid>
         </form>
-      </div>
+      </Paper>
     </Container>
   )
 }

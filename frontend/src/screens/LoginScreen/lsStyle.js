@@ -8,6 +8,7 @@ export const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    padding: 20,
   },
   avatar: {
     margin: theme.spacing(1),
