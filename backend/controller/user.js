@@ -29,21 +29,25 @@ const authUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-  })
-
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      image: user.image,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
+  try {
+    const user = await User.create({
+      name,
+      email,
+      password,
     })
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        image: user.image,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
+      })
+    }
+  } catch (error) {
+    res.status(404)
+    throw new Error('Email already registered')
   }
 })
 

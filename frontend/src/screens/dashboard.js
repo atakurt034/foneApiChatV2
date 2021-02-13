@@ -135,27 +135,48 @@ const Handler = ({ history }) => {
               }}
             >
               <Grid xs={12} item>
-                <Typography variant='h6' style={{ textAlign: 'center' }}>
+                <Typography
+                  variant='h5'
+                  style={{ textAlign: 'center', padding: 10 }}
+                >
                   Chatrooms
                 </Typography>
               </Grid>
-              {chatrooms.length > 0 &&
-                chatrooms.map((chatroom) => (
-                  <Typography key={chatroom._id} style={{ padding: 5 }}>
-                    <Link
-                      to={`/chatroom/${chatroom._id}`}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <Button variant='outlined' startIcon={<ChatIcon />}>
-                        <div>{chatroom.name}</div>
-                      </Button>
-                    </Link>
-                    <Typography
-                      variant='caption'
-                      style={{ padding: 5 }}
-                    >{` ${chatroom.users.length} users`}</Typography>
-                  </Typography>
-                ))}
+              <Paper
+                style={{
+                  padding: 20,
+                  margin: 10,
+                  border: '2px solid #ccc',
+                  boxShadow: '3px 4px #eee',
+                }}
+              >
+                {chatrooms.length > 0 &&
+                  chatrooms.map((chatroom) => (
+                    <Typography key={chatroom._id} style={{ padding: 5 }}>
+                      <Link
+                        to={`/chatroom/${chatroom._id}`}
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <Button
+                          variant='outlined'
+                          style={{
+                            boxShadow: '2px 3px #ccc',
+                            width: '30%',
+                            justifyContent: 'normal',
+                            overflow: 'hidden',
+                            margin: 5,
+                          }}
+                          startIcon={<ChatIcon fontSize='large' />}
+                        >
+                          <div>{chatroom.name}</div>
+                        </Button>
+                      </Link>
+                      <Typography variant='caption' style={{ padding: 5 }}>
+                        {` ${chatroom.users.length} online users`}
+                      </Typography>
+                    </Typography>
+                  ))}
+              </Paper>
             </Paper>
           </Grid>
         </Grid>

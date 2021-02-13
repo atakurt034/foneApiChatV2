@@ -12,7 +12,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 
 import { ModalLoader } from '../../components/ModalLoader'
-import Message from '../../components/Message'
+import { ModalMessage } from '../../components/ModalMessage'
 
 import { Link } from 'react-router-dom'
 
@@ -51,9 +51,6 @@ export const RegisterScreen = ({ location, history }) => {
   const userRegister = useSelector((state) => state.userRegister)
   const { loading, error, userInfo } = userRegister
 
-  // const userLogin = useSelector((state) => state.userLogin)
-  // const { userInfo: Info } = userLogin
-
   const redirect = location.search ? location.search.split('=')[1] : '/'
 
   useEffect(() => {
@@ -79,6 +76,7 @@ export const RegisterScreen = ({ location, history }) => {
         </Typography>
 
         {loading && <ModalLoader />}
+        {error && <ModalMessage variant='error'>{error}</ModalMessage>}
 
         <form onSubmit={submitHandler} className={classes.form}>
           <Grid container spacing={2}>

@@ -19,6 +19,7 @@ import { useStyles } from './lsStyle'
 import { useSelector, useDispatch } from 'react-redux'
 import { UA } from '../../actions/index'
 import { ModalLoader } from '../../components/ModalLoader'
+import { ModalMessage } from '../../components/ModalMessage'
 
 export const LoginScreen = ({ history }) => {
   const dispatch = useDispatch()
@@ -26,7 +27,7 @@ export const LoginScreen = ({ history }) => {
   const [password, setPassword] = useState('')
 
   const userLogin = useSelector((state) => state.userLogin)
-  const { userInfo, loading } = userLogin
+  const { userInfo, loading, error } = userLogin
 
   React.useEffect(() => {
     if (userInfo && !loading) {
@@ -41,11 +42,11 @@ export const LoginScreen = ({ history }) => {
 
   const classes = useStyles()
 
-  return loading ? (
-    <ModalLoader />
-  ) : (
-    <Container component='div' maxWidth='sm'>
+  return (
+    <Container component='div' maxWidth='xs'>
       <CssBaseline />
+      {loading && <ModalLoader />}
+      {error && <ModalMessage variant='error'>{error}</ModalMessage>}
       <Paper elevation={12} className={classes.paper}>
         <Typography
           className={classes.icon}
@@ -102,14 +103,25 @@ export const LoginScreen = ({ history }) => {
           </Button>
           <Grid container>
             <Grid item xs={6}>
-              <Link to='/forgot' variant='body2'>
-                <Typography variant='caption'>Forgot password?</Typography>
+              <Link to='/forgot'>
+                <Typography variant='body2' style={{ fontSize: '0.8rem' }}>
+                  Forgot password?
+                </Typography>
               </Link>
             </Grid>
             <Grid item xs={6}>
-              <Link to={'/register'} variant='body2'>
-                <Typography variant='caption'>
-                  {"Don't have an account? Sign Up"}
+              <Link to={'/register'}>
+                <Typography
+                  variant='body2'
+                  style={{ textAlign: 'center', fontSize: '0.8rem' }}
+                >
+                  {"Don't have an account? "}
+                </Typography>
+                <Typography
+                  variant='body2'
+                  style={{ textAlign: 'center', fontSize: '0.8rem' }}
+                >
+                  {'Sign Up'}
                 </Typography>
               </Link>
             </Grid>

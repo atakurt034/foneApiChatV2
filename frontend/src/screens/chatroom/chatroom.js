@@ -328,6 +328,7 @@ const Chat = ({ history, match }) => {
                     </Paper>
                   ))
                 )}
+
                 {response.map((text, index) => (
                   <Paper
                     elevation={12}
