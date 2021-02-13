@@ -170,7 +170,7 @@ const Chat = ({ history, match }) => {
 
     socket.on('leaveRoom', ({ name, users }) => {
       setUserList(Object.values(users))
-      enqueueSnackbar(`${name} entered`, {
+      enqueueSnackbar(`${name} left`, {
         anchorOrigin: {
           vertical: 'top',
           horizontal: 'right',
