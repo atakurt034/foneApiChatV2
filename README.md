@@ -9,6 +9,7 @@
 <li>JWT_SECRET = </li>
 </ul>
 
+<p>npm run dev to run both client and server</p>
 
 
 
