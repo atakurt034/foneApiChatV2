@@ -1,11 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Box,
   Button,
   Container,
   Grid,
-  IconButton,
   Paper,
   TextField,
   Typography,
@@ -18,9 +16,13 @@ import { CHAT } from '../constants/index'
 
 import ChatIcon from '@material-ui/icons/Chat'
 import { ModalLoader } from '../components/ModalLoader'
-import Message from '../components/Message'
+import { ModalMessage } from '../components/ModalMessage'
 
-export const Dashboard = ({ history }) => {
+import { SnackbarProvider, useSnackbar } from 'notistack'
+
+const Handler = ({ history }) => {
+  const { enqueueSnackbar } = useSnackbar()
+
   const dispatch = useDispatch()
   const [chatrooms, setChatrooms] = React.useState([])
   const [name, setName] = React.useState('')
@@ -29,7 +31,7 @@ export const Dashboard = ({ history }) => {
   const { userInfo, loading: loadingUser } = userLogin
 
   const createRoom = useSelector((state) => state.createRoom)
-  const { success } = createRoom
+  const { success, error: errorCreate } = createRoom
 
   const getRooms = useSelector((state) => state.getRooms)
   const { error, loading, rooms } = getRooms
@@ -51,21 +53,43 @@ export const Dashboard = ({ history }) => {
       history.push('/login')
     }
     if (rooms) {
-      setChatrooms(rooms.reverse())
+      setChatrooms(rooms)
     }
     if (success) {
       setName('')
       dispatch(CA.getRooms())
       dispatch({ type: CHAT.CREATE_ROOM_RESET })
+      enqueueSnackbar(`Chatroom ${name} created`, {
+        anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'right',
+        },
+        variant: 'success',
+        autoHideDuration: 3000,
+      })
     }
-  }, [chatrooms, rooms, userInfo, history, success, dispatch])
+  }, [
+    chatrooms,
+    rooms,
+    userInfo,
+    history,
+    success,
+    enqueueSnackbar,
+    name,
+    dispatch,
+  ])
 
   return loading || loadingUser ? (
     <ModalLoader />
-  ) : error ? (
-    <Message variant='error'>{error}</Message>
   ) : (
     <Container>
+      {error ? (
+        <ModalMessage variant='error'>{error}</ModalMessage>
+      ) : (
+        errorCreate && (
+          <ModalMessage variant='error'>{errorCreate}</ModalMessage>
+        )
+      )}
       <Paper
         elevation={12}
         style={{ padding: 20, marginTop: 20, height: '80vh', overflow: 'auto' }}
@@ -126,6 +150,10 @@ export const Dashboard = ({ history }) => {
                         <div>{chatroom.name}</div>
                       </Button>
                     </Link>
+                    <Typography
+                      variant='caption'
+                      style={{ padding: 5 }}
+                    >{` ${chatroom.users.length} users`}</Typography>
                   </Typography>
                 ))}
             </Paper>
@@ -133,5 +161,13 @@ export const Dashboard = ({ history }) => {
         </Grid>
       </Paper>
     </Container>
+  )
+}
+
+export const Dashboard = ({ history, match }) => {
+  return (
+    <SnackbarProvider maxSnack={6}>
+      <Handler history={history} match={match} />
+    </SnackbarProvider>
   )
 }

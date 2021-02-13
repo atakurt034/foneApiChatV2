@@ -84,3 +84,31 @@ export const getRoomDetails = (id) => async (dispatch, getState) => {
     })
   }
 }
+
+export const getMessages = (id) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: CHAT.GET_MESSAGES_REQUEST })
+
+    const {
+      userLogin: { userInfo },
+    } = getState()
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    }
+
+    const { data } = await axios.get(`/api/chatrooms/messages/${id}`, config)
+    dispatch({ type: CHAT.GET_MESSAGES_SUCCESS, payload: data })
+  } catch (error) {
+    dispatch({
+      type: CHAT.GET_MESSAGES_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}

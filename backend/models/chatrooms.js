@@ -13,12 +13,7 @@ const chatroomSchema = new mongoose.Schema(
         required: true,
       },
     ],
-    messages: [
-      {
-        message: { type: String },
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      },
-    ],
+    messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
   },
   { timestamps: true }
 )

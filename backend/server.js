@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken'
 import morgan from 'morgan'
 import User from './models/user.js'
 import Chatroom from './models/chatrooms.js'
+import Message from './models/messages.js'
 
 dotenv.config()
 const app = express()
@@ -58,10 +59,20 @@ const users = {}
 io.on('connect', (socket) => {
   socket.on('joinRoom', async ({ chatroomId }) => {
     const user = await User.findOne({ _id: socket.userId })
+    const chatroom = await Chatroom.findById(chatroomId)
+
+    const userExist = chatroom.users.find(
+      (x) => x.toString() === user._id.toString()
+    )
+
+    if (!userExist) {
+      chatroom.users.push(user)
+    }
     users[socket.userId] = user.name
     socket.join(chatroomId)
 
     io.to(chatroomId).emit('joinRoom', { name: user.name, users })
+    await chatroom.save()
   })
 
   socket.on('leaveRoom', async ({ chatroomId }) => {
@@ -75,16 +86,21 @@ io.on('connect', (socket) => {
   socket.on('input', async ({ message, chatroomId, id }) => {
     if (message.trim().length > 0) {
       const user = await User.findOne({ _id: socket.userId })
-      const room = await Chatroom.findById(chatroomId)
-      room.messages.push({ message, user: user._id })
+      const chatroom = await Chatroom.findById(chatroomId)
+      const newMessage = await Message.create({
+        message,
+        user,
+        chatroom: chatroomId,
+      })
+
+      chatroom.messages.push(newMessage)
 
       io.to(chatroomId).emit('output', {
         message,
         name: user.name,
         id,
       })
-      await room.save()
-      console.log('input ' + chatroomId)
+      await chatroom.save()
     }
   })
 })

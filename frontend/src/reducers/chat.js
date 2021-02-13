@@ -44,3 +44,18 @@ export const getRoomDetailsReducer = (state = {}, action) => {
       return state
   }
 }
+
+export const getMessagesReducer = (state = {}, action) => {
+  switch (action.type) {
+    case CHAT.GET_MESSAGES_REQUEST:
+      return { loading: true, success: false }
+    case CHAT.GET_MESSAGES_SUCCESS:
+      return { loading: false, messages: action.payload }
+    case CHAT.GET_MESSAGES_FAIL:
+      return { loading: false, error: action.payload }
+    case CHAT.GET_MESSAGES_RESET:
+      return {}
+    default:
+      return state
+  }
+}

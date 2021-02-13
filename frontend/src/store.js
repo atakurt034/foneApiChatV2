@@ -10,6 +10,7 @@ const reducer = combineReducers({
   getRooms: CHAT.getRoomsReducer,
   createRoom: CHAT.createRoomsReducer,
   getRoomDetails: CHAT.getRoomDetailsReducer,
+  getMessages: CHAT.getMessagesReducer,
 })
 
 const userInfoFromStorage = localStorage.getItem('userInfo')
