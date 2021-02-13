@@ -100,7 +100,7 @@ const Handler = ({ history }) => {
               Dashboard
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Paper
               elevation={12}
               style={{ marginTop: 20, padding: 20, textAlign: 'center' }}
@@ -122,7 +122,7 @@ const Handler = ({ history }) => {
               </form>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Paper
               elevation={12}
               style={{
@@ -150,32 +150,43 @@ const Handler = ({ history }) => {
                   boxShadow: '3px 4px #eee',
                 }}
               >
-                {chatrooms.length > 0 &&
-                  chatrooms.map((chatroom) => (
-                    <Typography key={chatroom._id} style={{ padding: 5 }}>
-                      <Link
-                        to={`/chatroom/${chatroom._id}`}
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <Button
-                          variant='outlined'
-                          style={{
-                            boxShadow: '2px 3px #ccc',
-                            width: '30%',
-                            justifyContent: 'normal',
-                            overflow: 'hidden',
-                            margin: 5,
-                          }}
-                          startIcon={<ChatIcon fontSize='large' />}
-                        >
-                          <div>{chatroom.name}</div>
-                        </Button>
-                      </Link>
-                      <Typography variant='caption' style={{ padding: 5 }}>
-                        {` ${chatroom.users.length} online users`}
-                      </Typography>
-                    </Typography>
-                  ))}
+                <Grid
+                  container
+                  justify='center'
+                  alignItems='center'
+                  spacing={2}
+                >
+                  {chatrooms.length > 0 &&
+                    chatrooms.map((chatroom) => (
+                      <>
+                        <Grid item xs={8} key={chatroom._id}>
+                          <Link
+                            to={`/chatroom/${chatroom._id}`}
+                            style={{ textDecoration: 'none' }}
+                          >
+                            <Button
+                              variant='outlined'
+                              style={{
+                                boxShadow: '2px 3px #ccc',
+                                width: '100%',
+                                justifyContent: 'normal',
+                                overflow: 'hidden',
+                                margin: 5,
+                              }}
+                              startIcon={<ChatIcon fontSize='large' />}
+                            >
+                              <div>{chatroom.name}</div>
+                            </Button>
+                          </Link>
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Typography variant='caption' style={{ padding: 5 }}>
+                            {` ${chatroom.users.length}  users`}
+                          </Typography>
+                        </Grid>
+                      </>
+                    ))}
+                </Grid>
               </Paper>
             </Paper>
           </Grid>
