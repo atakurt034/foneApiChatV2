@@ -68,3 +68,16 @@ export const getMessages = asyncHandler(async (req, res) => {
     throw new Error('No Chatrooms found')
   }
 })
+
+export const deleteChatroom = asyncHandler(async (req, res) => {
+  const id = req.params.id
+  const room = await Chatroom.findById(id)
+  const deleted = await Chatroom.deleteOne(room)
+  if (deleted) {
+    res.status(202)
+    res.json({ status: 202 })
+  } else {
+    res.status(204)
+    throw new Error('Delete Failed')
+  }
+})

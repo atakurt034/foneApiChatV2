@@ -4,7 +4,7 @@ import { Container } from '@material-ui/core'
 import { Chatroom } from './screens/chatroom/chatroom'
 import { LoginScreen } from './screens/LoginScreen/LoginScreen'
 import { RegisterScreen } from './screens/RegisterScreen/RegisterScreen'
-import { Dashboard } from './screens/dashboard'
+import { Dashboard } from './screens/dashboard/dashboard'
 
 import Header from './components/Header'
 
