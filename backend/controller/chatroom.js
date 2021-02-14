@@ -85,7 +85,9 @@ export const deleteChatroom = asyncHandler(async (req, res) => {
 export const editChatroomName = asyncHandler(async (req, res) => {
   const id = req.params.id
   const room = await Chatroom.findById(id)
-  const existName = await Chatroom.findOne({ name: room.name })
+  const existName = await Chatroom.findOne({ name: req.body.text })
+
+  console.log(existName)
 
   if (existName) {
     res.status(404)
