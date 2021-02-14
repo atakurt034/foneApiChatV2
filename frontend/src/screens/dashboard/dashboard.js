@@ -26,15 +26,14 @@ import EditIcon from '@material-ui/icons/Edit'
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever'
 import axios from 'axios'
 
+import { Confirm } from '../../components/dialog'
+
 const Handler = ({ history }) => {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const theme = useTheme()
   const sm = useMediaQuery(theme.breakpoints.down('sm'))
-
   const dispatch = useDispatch()
-  const [chatrooms, setChatrooms] = React.useState([])
-  const [name, setName] = React.useState('')
 
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo, loading: loadingUser } = userLogin
@@ -44,6 +43,11 @@ const Handler = ({ history }) => {
 
   const getRooms = useSelector((state) => state.getRooms)
   const { error, loading, rooms } = getRooms
+
+  const [chatrooms, setChatrooms] = React.useState([])
+  const [name, setName] = React.useState('')
+  const [open, setOpen] = React.useState(false)
+  const [deleteData, setDeleteData] = React.useState({})
 
   const submitHandler = (event) => {
     event.preventDefault()
@@ -95,41 +99,60 @@ const Handler = ({ history }) => {
   }
 
   const deleteHandler = async (id, chatroomName) => {
-    if (window.confirm(`Delete ${chatroomName}?`)) {
-      try {
-        const config = {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        }
-        const { data } = await axios.delete(`/api/chatrooms/${id}`, config)
-        console.log(data)
-        if (data.status === 202) {
-          enqueueSnackbar(`Chatroom ${chatroomName} deleted`, {
-            anchorOrigin: {
-              vertical: 'top',
-              horizontal: 'right',
-            },
-            variant: 'error',
-            autoHideDuration: 3000,
-            onEntered: () => {
-              dispatch(CA.getRooms())
-            },
-          })
-        }
-      } catch (error) {
-        console.log(error)
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
       }
+      const { data } = await axios.delete(`/api/chatrooms/${id}`, config)
+      console.log(data)
+      if (data.status === 202) {
+        enqueueSnackbar(`Chatroom ${chatroomName} deleted`, {
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+          variant: 'error',
+          autoHideDuration: 3000,
+          onEntered: () => {
+            dispatch(CA.getRooms())
+          },
+        })
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
   const editHandler = (params) => {}
+
+  const resultHandler = (e) => {
+    if (e) {
+      deleteHandler(deleteData.id, deleteData.chatroomName)
+    }
+    closeHandler()
+  }
+
+  const closeHandler = () => {
+    setOpen(false)
+  }
+
+  const deleteResultHandler = (id, chatroomName) => {
+    setOpen(true)
+    setDeleteData({ id, chatroomName })
+  }
 
   return loading || loadingUser ? (
     <ModalLoader />
   ) : (
     <Container
-      style={{ position: 'relative', maxHeight: '90vh', overflow: 'hidden' }}
+      style={{
+        position: 'relative',
+        maxHeight: '100%',
+        overflow: 'hidden',
+        maxWidth: '100vw',
+      }}
     >
       {error ? (
         <ModalMessage variant='error'>{error}</ModalMessage>
@@ -140,7 +163,7 @@ const Handler = ({ history }) => {
       )}
       <Paper
         elevation={12}
-        style={{ padding: 20, margin: '20px auto', height: '80vh' }}
+        style={{ padding: 20, margin: '20px auto', height: '100%' }}
       >
         <Grid container justify='center' spacing={3}>
           <Grid xs={12} item>
@@ -210,9 +233,8 @@ const Handler = ({ history }) => {
                   margin: 10,
                   border: '2px solid #ccc',
                   boxShadow: '3px 4px #eee',
-                  height: '26vh',
+                  height: '50vh',
                   backgroundColor: 'ButtonShadow',
-                  overflow: 'auto',
                 }}
               >
                 <Grid
@@ -220,7 +242,12 @@ const Handler = ({ history }) => {
                   justify='center'
                   // alignItems='center'
                   spacing={2}
-                  style={{ overflow: 'auto', maxHeight: '100%', padding: 5 }}
+                  style={{
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    maxHeight: '100%',
+                    padding: 5,
+                  }}
                 >
                   {chatrooms.length > 0 &&
                     chatrooms.map((chatroom) => (
@@ -293,12 +320,21 @@ const Handler = ({ history }) => {
                                 <IconButton
                                   color='secondary'
                                   onClick={() =>
-                                    deleteHandler(chatroom._id, chatroom.name)
+                                    deleteResultHandler(
+                                      chatroom._id,
+                                      chatroom.name
+                                    )
                                   }
                                 >
                                   <DeleteForeverIcon />
                                 </IconButton>
                               </Grid>
+                              <Confirm
+                                clicked={open}
+                                closed={closeHandler}
+                                result={resultHandler}
+                                data={deleteData.chatroomName}
+                              />
                             </>
                           )}
                         </Grid>
@@ -314,10 +350,10 @@ const Handler = ({ history }) => {
   )
 }
 
-export const Dashboard = ({ history, match }) => {
+export const Dashboard = (props) => {
   return (
     <SnackbarProvider maxSnack={6}>
-      <Handler history={history} match={match} />
+      <Handler {...props} />
     </SnackbarProvider>
   )
 }
