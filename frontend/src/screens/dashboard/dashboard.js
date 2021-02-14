@@ -76,6 +76,7 @@ const Handler = ({ history }) => {
           autoHideDuration: 3000,
           onEntered: () => {
             dispatch(CA.getRooms())
+            dispatch({ type: CHAT.DELETE_ROOM_RESET })
           },
         })
       }
@@ -93,6 +94,7 @@ const Handler = ({ history }) => {
             autoHideDuration: 3000,
             onEntered: () => {
               dispatch(CA.getRooms())
+              dispatch({ type: CHAT.EDIT_ROOM_RESET })
             },
           }
         )
@@ -152,7 +154,7 @@ const Handler = ({ history }) => {
   }
 
   const editRecievedHandler = (e, name) => {
-    setEditData({ name: name })
+    setEditData({ ...editData, name: name })
     if (e) {
       dispatch(CA.editRoom(editData.id, name))
     }

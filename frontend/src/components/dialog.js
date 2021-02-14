@@ -18,7 +18,7 @@ export const Confirm = ({ clicked, closed, result, data }) => {
       <DialogTitle>Are You Sure?</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {`Delete ${data}  you won't be able to rever this`}
+          {`Delete ${data}  you won't be able to revert this`}
         </DialogContentText>
       </DialogContent>
       <DialogActions>

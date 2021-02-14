@@ -52,12 +52,12 @@ export const getRoomDetails = asyncHandler(async (req, res) => {
 export const getMessages = asyncHandler(async (req, res) => {
   const id = req.params.id
   const limit = req.query.limit ? Number(req.query.limit) : 10
-  const skip = req.query.skip ? Number(req.query.skip) : 1
+  const skip = req.query.skip || 1
   const messages = await Message.find({ chatroom: id })
     .populate('user', 'name')
     .populate('chatroom', 'name users')
     .limit(limit)
-    .skip(skip)
+    .skip(skip - 1)
     .sort({ createdAt: -1 })
 
   if (messages) {
