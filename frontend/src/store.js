@@ -11,6 +11,8 @@ const reducer = combineReducers({
   createRoom: CHAT.createRoomsReducer,
   getRoomDetails: CHAT.getRoomDetailsReducer,
   getMessages: CHAT.getMessagesReducer,
+  deleteRoom: CHAT.deleteRoomReducer,
+  editRoom: CHAT.editRoomReducer,
 })
 
 const userInfoFromStorage = localStorage.getItem('userInfo')

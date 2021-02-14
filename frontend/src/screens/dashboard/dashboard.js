@@ -24,9 +24,8 @@ import { useStyles } from './styles'
 import { SnackbarProvider, useSnackbar } from 'notistack'
 import EditIcon from '@material-ui/icons/Edit'
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever'
-import axios from 'axios'
 
-import { Confirm } from '../../components/dialog'
+import { Confirm, FormDialog } from '../../components/dialog'
 
 const Handler = ({ history }) => {
   const { enqueueSnackbar } = useSnackbar()
@@ -44,10 +43,18 @@ const Handler = ({ history }) => {
   const getRooms = useSelector((state) => state.getRooms)
   const { error, loading, rooms } = getRooms
 
+  const deleteRoom = useSelector((state) => state.deleteRoom)
+  const { status, error: errorDelete } = deleteRoom
+
+  const editRoom = useSelector((state) => state.editRoom)
+  const { status: statusEdit, error: errorEdit } = editRoom
+
   const [chatrooms, setChatrooms] = React.useState([])
   const [name, setName] = React.useState('')
   const [open, setOpen] = React.useState(false)
   const [deleteData, setDeleteData] = React.useState({})
+  const [openForm, setOpenForm] = React.useState(false)
+  const [editData, setEditData] = React.useState({})
 
   const submitHandler = (event) => {
     event.preventDefault()
@@ -58,8 +65,42 @@ const Handler = ({ history }) => {
     if (userInfo) {
       dispatch(CA.getRooms())
     }
+    if (status) {
+      if (status.status === 202) {
+        enqueueSnackbar(`Chatroom ${deleteData.chatroomName} deleted`, {
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+          variant: 'error',
+          autoHideDuration: 3000,
+          onEntered: () => {
+            dispatch(CA.getRooms())
+          },
+        })
+      }
+    }
+    if (statusEdit) {
+      if (statusEdit.status === 202) {
+        enqueueSnackbar(
+          `Chatroom ${editData.chatroomName} edited to ${editData.name}`,
+          {
+            anchorOrigin: {
+              vertical: 'top',
+              horizontal: 'right',
+            },
+            variant: 'error',
+            autoHideDuration: 3000,
+            onEntered: () => {
+              dispatch(CA.getRooms())
+            },
+          }
+        )
+      }
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [deleteRoom, enqueueSnackbar, status, statusEdit])
 
   React.useEffect(() => {
     if (!userInfo) {
@@ -98,49 +139,29 @@ const Handler = ({ history }) => {
     history.push(`/chatroom/${id}`)
   }
 
-  const deleteHandler = async (id, chatroomName) => {
-    try {
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-      }
-      const { data } = await axios.delete(`/api/chatrooms/${id}`, config)
-      console.log(data)
-      if (data.status === 202) {
-        enqueueSnackbar(`Chatroom ${chatroomName} deleted`, {
-          anchorOrigin: {
-            vertical: 'top',
-            horizontal: 'right',
-          },
-          variant: 'error',
-          autoHideDuration: 3000,
-          onEntered: () => {
-            dispatch(CA.getRooms())
-          },
-        })
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  const editHandler = (params) => {}
-
   const resultHandler = (e) => {
     if (e) {
-      deleteHandler(deleteData.id, deleteData.chatroomName)
+      dispatch(CA.deleteRoom(deleteData.id, deleteData.chatroomName))
     }
-    closeHandler()
-  }
-
-  const closeHandler = () => {
     setOpen(false)
   }
 
   const deleteResultHandler = (id, chatroomName) => {
     setOpen(true)
     setDeleteData({ id, chatroomName })
+  }
+
+  const editRecievedHandler = (e, name) => {
+    setEditData({ name: name })
+    if (e) {
+      dispatch(CA.editRoom(editData.id, name))
+    }
+    setOpenForm(false)
+  }
+
+  const editDataHandler = (id, chatroomName) => {
+    setOpenForm(true)
+    setEditData({ id, chatroomName })
   }
 
   return loading || loadingUser ? (
@@ -156,10 +177,12 @@ const Handler = ({ history }) => {
     >
       {error ? (
         <ModalMessage variant='error'>{error}</ModalMessage>
+      ) : errorCreate ? (
+        <ModalMessage variant='error'>{errorCreate}</ModalMessage>
+      ) : errorDelete ? (
+        <ModalMessage variant='error'>{errorDelete}</ModalMessage>
       ) : (
-        errorCreate && (
-          <ModalMessage variant='error'>{errorCreate}</ModalMessage>
-        )
+        errorEdit && <ModalMessage variant='error'>{errorEdit}</ModalMessage>
       )}
       <Paper
         elevation={12}
@@ -311,7 +334,9 @@ const Handler = ({ history }) => {
                               <Grid item xs={3} sm={2} md={1}>
                                 <IconButton
                                   color='primary'
-                                  onClick={() => editHandler(chatroom._id)}
+                                  onClick={() =>
+                                    editDataHandler(chatroom._id, chatroom.name)
+                                  }
                                 >
                                   <EditIcon />
                                 </IconButton>
@@ -331,9 +356,15 @@ const Handler = ({ history }) => {
                               </Grid>
                               <Confirm
                                 clicked={open}
-                                closed={closeHandler}
+                                closed={() => setOpen(false)}
                                 result={resultHandler}
                                 data={deleteData.chatroomName}
+                              />
+                              <FormDialog
+                                handleClose={() => setOpenForm(false)}
+                                open={openForm}
+                                editData={editRecievedHandler}
+                                chatroomName={editData.chatroomName}
                               />
                             </>
                           )}

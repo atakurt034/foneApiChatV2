@@ -112,3 +112,57 @@ export const getMessages = (id) => async (dispatch, getState) => {
     })
   }
 }
+
+export const deleteRoom = (id, chatroomName) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: CHAT.DELETE_ROOM_REQUEST })
+
+    const {
+      userLogin: { userInfo },
+    } = getState()
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    }
+    const { data } = await axios.delete(`/api/chatrooms/${id}`, config)
+    dispatch({ type: CHAT.DELETE_ROOM_SUCCESS, payload: data })
+  } catch (error) {
+    dispatch({
+      type: CHAT.DELETE_ROOM_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}
+
+export const editRoom = (id, text) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: CHAT.EDIT_ROOM_REQUEST })
+
+    const {
+      userLogin: { userInfo },
+    } = getState()
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    }
+    const { data } = await axios.put(`/api/chatrooms/${id}`, { text }, config)
+    dispatch({ type: CHAT.EDIT_ROOM_SUCCESS, payload: data })
+  } catch (error) {
+    dispatch({
+      type: CHAT.EDIT_ROOM_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}

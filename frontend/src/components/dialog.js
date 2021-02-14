@@ -5,6 +5,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import { TextField } from '@material-ui/core'
 
 export const Confirm = ({ clicked, closed, result, data }) => {
   return (
@@ -26,6 +27,39 @@ export const Confirm = ({ clicked, closed, result, data }) => {
         </Button>
         <Button onClick={() => result(true)} color='primary' autoFocus>
           Agree
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+export const FormDialog = ({ open, handleClose, chatroomName, editData }) => {
+  const [textValue, setTextValue] = React.useState('')
+
+  return (
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      aria-labelledby='form-dialog-title'
+    >
+      <DialogTitle>{`Edit ${chatroomName}`} </DialogTitle>
+      <DialogContent>
+        <DialogContentText>Please input new name</DialogContentText>
+        <TextField
+          autoFocus
+          margin='dense'
+          label='Input text'
+          type='text'
+          fullWidth
+          onChange={(e) => setTextValue(e.target.value)}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => editData(false, textValue)} color='primary'>
+          Cancel
+        </Button>
+        <Button onClick={() => editData(true, textValue)} color='primary'>
+          Edit
         </Button>
       </DialogActions>
     </Dialog>

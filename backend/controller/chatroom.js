@@ -81,3 +81,26 @@ export const deleteChatroom = asyncHandler(async (req, res) => {
     throw new Error('Delete Failed')
   }
 })
+
+export const editChatroomName = asyncHandler(async (req, res) => {
+  const id = req.params.id
+  const room = await Chatroom.findById(id)
+  const existName = await Chatroom.findOne({ name: room.name })
+
+  if (existName) {
+    res.status(404)
+    throw new Error('Name already exist')
+  } else {
+    room.name = req.body.text || room.name
+
+    const saved = await room.save()
+
+    if (saved) {
+      res.status(202)
+      res.json({ status: 202 })
+    } else {
+      res.status(204)
+      throw new Error('Edit failed')
+    }
+  }
+})

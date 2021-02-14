@@ -59,3 +59,33 @@ export const getMessagesReducer = (state = {}, action) => {
       return state
   }
 }
+
+export const deleteRoomReducer = (state = {}, action) => {
+  switch (action.type) {
+    case CHAT.DELETE_ROOM_REQUEST:
+      return { loading: true, success: false }
+    case CHAT.DELETE_ROOM_SUCCESS:
+      return { loading: false, status: action.payload }
+    case CHAT.DELETE_ROOM_FAIL:
+      return { loading: false, error: action.payload }
+    case CHAT.DELETE_ROOM_RESET:
+      return {}
+    default:
+      return state
+  }
+}
+
+export const editRoomReducer = (state = {}, action) => {
+  switch (action.type) {
+    case CHAT.EDIT_ROOM_REQUEST:
+      return { loading: true, success: false }
+    case CHAT.EDIT_ROOM_SUCCESS:
+      return { loading: false, status: action.payload }
+    case CHAT.EDIT_ROOM_FAIL:
+      return { loading: false, error: action.payload }
+    case CHAT.EDIT_ROOM_RESET:
+      return {}
+    default:
+      return state
+  }
+}
