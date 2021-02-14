@@ -128,7 +128,9 @@ const Handler = ({ history }) => {
   return loading || loadingUser ? (
     <ModalLoader />
   ) : (
-    <Container>
+    <Container
+      style={{ position: 'relative', maxHeight: '90vh', overflow: 'hidden' }}
+    >
       {error ? (
         <ModalMessage variant='error'>{error}</ModalMessage>
       ) : (
@@ -138,7 +140,7 @@ const Handler = ({ history }) => {
       )}
       <Paper
         elevation={12}
-        style={{ padding: 20, marginTop: 20, height: '80vh' }}
+        style={{ padding: 20, margin: '20px auto', height: '80vh' }}
       >
         <Grid container justify='center' spacing={3}>
           <Grid xs={12} item>
@@ -169,13 +171,19 @@ const Handler = ({ history }) => {
               </form>
             </Paper>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            style={{ height: '80%', position: 'relative' }}
+          >
             <Paper
               elevation={12}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                marginTop: 20,
+                margin: '20px auto',
+                height: '100%',
               }}
             >
               <Grid
@@ -184,6 +192,7 @@ const Handler = ({ history }) => {
                 container
                 alignContent='center'
                 justify='center'
+                style={{ maxHeight: '100%', overflow: 'auto' }}
               >
                 <Typography
                   variant='h5'
@@ -201,16 +210,17 @@ const Handler = ({ history }) => {
                   margin: 10,
                   border: '2px solid #ccc',
                   boxShadow: '3px 4px #eee',
-                  height: '380px',
+                  height: '26vh',
                   backgroundColor: 'ButtonShadow',
+                  overflow: 'auto',
                 }}
               >
                 <Grid
                   container
                   justify='center'
-                  alignItems='center'
+                  // alignItems='center'
                   spacing={2}
-                  style={{ overflow: 'auto', height: '100%', padding: 5 }}
+                  style={{ overflow: 'auto', maxHeight: '100%', padding: 5 }}
                 >
                   {chatrooms.length > 0 &&
                     chatrooms.map((chatroom) => (
@@ -219,6 +229,7 @@ const Handler = ({ history }) => {
                         style={{
                           width: '100%',
                           margin: '8px auto',
+                          maxHeight: '90px',
                         }}
                         key={chatroom._id}
                       >
