@@ -1,17 +1,24 @@
 import React from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { UA } from '../actions/index'
 
 import { Link } from 'react-router-dom'
-import { Avatar } from '@material-ui/core'
+import {
+  Avatar,
+  makeStyles,
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  useMediaQuery,
+  useTheme,
+  IconButton,
+} from '@material-ui/core'
 import { Skeleton } from '@material-ui/lab'
-import { withRouter } from 'react-router-dom'
+
+import { UserDrawer } from './drawer'
+import ListIcon from '@material-ui/icons/List'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,13 +32,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Header = ({ history }) => {
+const Header = ({ history, socket }) => {
+  const theme = useTheme()
+  const sm = useMediaQuery(theme.breakpoints.down('sm'))
+
   const dispatch = useDispatch()
   const classes = useStyles()
-  const [login, setLogin] = React.useState()
 
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo, loading } = userLogin
+
+  const [login, setLogin] = React.useState()
+  const [open, setOpen] = React.useState(false)
+  const [userList, setUserList] = React.useState([])
 
   const clickHandler = () => {
     if (login === 'LOGOUT') {
@@ -49,11 +62,29 @@ const Header = ({ history }) => {
     }
   }, [userInfo])
 
+  React.useEffect(() => {
+    if (socket) {
+      socket.on('joinRoom', ({ name, users }) => {
+        setUserList(Object.values(users))
+      })
+
+      socket.on('leaveRoom', ({ name, users }) => {
+        setUserList(Object.values(users))
+      })
+    }
+  }, [socket])
+
   return (
     <div className={classes.root}>
       <AppBar position='static'>
         <Toolbar>
-          <Avatar />
+          {sm ? (
+            <IconButton onClick={() => setOpen(true)}>
+              <ListIcon />
+            </IconButton>
+          ) : (
+            <Avatar />
+          )}
           <Typography variant='h6' className={classes.title}>
             {loading ? (
               <Skeleton width={20} variant='text' />
@@ -71,8 +102,13 @@ const Header = ({ history }) => {
           </Button>
         </Toolbar>
       </AppBar>
+      <UserDrawer
+        close={() => setOpen(false)}
+        open={open}
+        userList={userList}
+      />
     </div>
   )
 }
 
-export default withRouter(Header)
+export default Header

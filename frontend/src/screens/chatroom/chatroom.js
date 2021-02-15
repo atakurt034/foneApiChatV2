@@ -7,12 +7,12 @@ import {
   Grid,
   IconButton,
   InputBase,
-  makeStyles,
   Paper,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@material-ui/core'
 import React, { useState, useEffect } from 'react'
-import { io } from 'socket.io-client'
 
 import { CA } from '../../actions/index'
 import { CHAT } from '../../constants'
@@ -29,37 +29,13 @@ import axios from 'axios'
 
 import { Skeleton } from '@material-ui/lab'
 
-const useStyles = makeStyles(() => ({
-  root: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    width: '100%',
-    margin: 10,
-  },
-  input: {
-    width: '100%',
-    margin: 10,
-  },
-  iconButton: {
-    padding: 10,
-  },
-  card: {
-    backgroundColor: '#eee',
-  },
-  sender: {
-    backgroundColor: 'Highlight',
-    textAlign: 'right',
-    float: 'right',
-    clear: 'both',
-  },
-  reciever: { textAlign: 'left', float: 'left' },
-  text: { margin: '0 10px' },
-}))
+import { useStyles } from './styles'
 
-const Chat = ({ history, match }) => {
+const Chat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const theme = useTheme()
+  const sm = useMediaQuery(theme.breakpoints.down('sm'))
 
   const { enqueueSnackbar } = useSnackbar()
 
@@ -94,6 +70,7 @@ const Chat = ({ history, match }) => {
     if (userInfo) {
       dispatch(CA.getMessages(chatroomId))
       dispatch(CA.getRoomDetails(chatroomId))
+      sendChatroomId(chatroomId)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -119,11 +96,6 @@ const Chat = ({ history, match }) => {
 
   //**************************** socket *********************************//
 
-  const socket = io('http://192.168.254.111:5000', {
-    query: { token: userInfo.token, room: chatroomId },
-  })
-  socket.connect()
-
   useEffect(() => {
     let time = 1000
     setTimeout(() => {
@@ -135,14 +107,14 @@ const Chat = ({ history, match }) => {
     }, time)
     if (socket) {
       socket.emit('joinRoom', { chatroomId })
+      socket.on('output', (data) => {
+        setResponse((prev) => [
+          ...prev,
+          { ...data, isSender: data.id === userInfo._id },
+        ])
+        scrollToBottom()
+      })
     }
-    socket.on('output', (data) => {
-      setResponse((prev) => [
-        ...prev,
-        { ...data, isSender: data.id === userInfo._id },
-      ])
-      scrollToBottom()
-    })
 
     return () => {
       //Component Unmount
@@ -156,43 +128,48 @@ const Chat = ({ history, match }) => {
   }, [])
 
   useEffect(() => {
-    socket.on('joinRoom', ({ name, users }) => {
-      setUserList(Object.values(users))
-      enqueueSnackbar(`${name} entered`, {
-        anchorOrigin: {
-          vertical: 'top',
-          horizontal: 'right',
-        },
-        variant: 'success',
-        autoHideDuration: 1000,
+    if (socket) {
+      socket.on('joinRoom', ({ name, users }) => {
+        setUserList(Object.values(users))
+        enqueueSnackbar(`${name} entered`, {
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+          variant: 'success',
+          autoHideDuration: 1000,
+        })
       })
-    })
 
-    socket.on('leaveRoom', ({ name, users }) => {
-      setUserList(Object.values(users))
-      enqueueSnackbar(`${name} left`, {
-        anchorOrigin: {
-          vertical: 'top',
-          horizontal: 'right',
-        },
-        variant: 'error',
-        autoHideDuration: 1000,
+      socket.on('leaveRoom', ({ name, users }) => {
+        setUserList(Object.values(users))
+        enqueueSnackbar(`${name} left`, {
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+          variant: 'error',
+          autoHideDuration: 1000,
+        })
+        dispatch({ type: CHAT.CREATE_ROOM_RESET })
+        dispatch({ type: CHAT.GET_MESSAGES_RESET })
+        dispatch({ type: CHAT.GET_ROOMS_RESET })
+        dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
       })
-      dispatch({ type: CHAT.CREATE_ROOM_RESET })
-      dispatch({ type: CHAT.GET_MESSAGES_RESET })
-      dispatch({ type: CHAT.GET_ROOMS_RESET })
-      dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
-    })
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket])
 
   const clickHandler = () => {
-    socket.emit('input', {
-      message: textRef.current.value,
-      chatroomId,
-      id: userInfo._id,
-    })
-    textRef.current.value = ''
+    if (socket) {
+      socket.emit('input', {
+        message: textRef.current.value,
+        chatroomId,
+        id: userInfo._id,
+      })
+      textRef.current.value = ''
+    }
   }
 
   const changeHandler = (event) => {
@@ -241,18 +218,21 @@ const Chat = ({ history, match }) => {
     <ModalMessage variant='error'>{error}</ModalMessage>
   ) : (
     <Grid container justify='center' style={{ padding: 20 }}>
-      <Grid item xs={3}>
-        <Paper
-          elevation={12}
-          style={{ padding: 20, height: '75vh', overflow: 'auto' }}
-        >
-          <Typography variant='h6'>Online Users</Typography>
-          {userList.map((user, index) => (
-            <p key={index}>{user}</p>
-          ))}
-        </Paper>
-      </Grid>
-      <Grid item xs={8} style={{ margin: 'auto' }}>
+      {!sm && (
+        <Grid item xs={3}>
+          <Paper
+            elevation={12}
+            style={{ padding: 20, height: '75vh', overflow: 'auto' }}
+          >
+            <Typography variant='h6'>Online Users</Typography>
+            {userList.map((user, index) => (
+              <p key={index}>{user}</p>
+            ))}
+          </Paper>
+        </Grid>
+      )}
+
+      <Grid item xs={12} sm={8} style={{ margin: 'auto' }}>
         <Card elevation={12} className={classes.card}>
           <CardHeader title={chatname} subheader={new Date().toDateString()} />
           <CardContent style={{ height: '50vh', overflow: 'hidden' }}>
@@ -375,10 +355,15 @@ const Chat = ({ history, match }) => {
   )
 }
 
-export const Chatroom = ({ history, match }) => {
+export const Chatroom = ({ history, match, socket, sendChatroomId }) => {
   return (
     <SnackbarProvider maxSnack={6}>
-      <Chat history={history} match={match} />
+      <Chat
+        history={history}
+        match={match}
+        socket={socket}
+        sendChatroomId={sendChatroomId}
+      />
     </SnackbarProvider>
   )
 }
