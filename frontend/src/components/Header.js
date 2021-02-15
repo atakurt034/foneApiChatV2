@@ -14,11 +14,14 @@ import {
   useMediaQuery,
   useTheme,
   IconButton,
+  Grid,
 } from '@material-ui/core'
 import { Skeleton } from '@material-ui/lab'
 
 import { UserDrawer } from './drawer'
 import ListIcon from '@material-ui/icons/List'
+
+import { Account } from './NavItems/Account/Account'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,6 +32,10 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+  },
+  brand: {
+    flex: 1,
+    width: 'auto',
   },
 }))
 
@@ -75,39 +82,12 @@ const Header = ({ history, socket }) => {
   }, [socket])
 
   return (
-    <div className={classes.root}>
-      <AppBar position='static'>
-        <Toolbar>
-          {sm ? (
-            <IconButton onClick={() => setOpen(true)}>
-              <ListIcon />
-            </IconButton>
-          ) : (
-            <Avatar />
-          )}
-          <Typography variant='h6' className={classes.title}>
-            {loading ? (
-              <Skeleton width={20} variant='text' />
-            ) : userInfo ? (
-              userInfo.name.split(' ')[0]
-            ) : (
-              ''
-            )}
-          </Typography>
-          <Link to={'/'} style={{ textDecoration: 'none', color: '#fff' }}>
-            <Button color='inherit'>Dashboard</Button>
-          </Link>
-          <Button onClick={clickHandler} color='inherit'>
-            {login}
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <UserDrawer
-        close={() => setOpen(false)}
-        open={open}
-        userList={userList}
-      />
-    </div>
+    <AppBar position='static'>
+      <Toolbar>
+        <Grid className={classes.brand}>Chat App</Grid>
+        {<Account />}
+      </Toolbar>
+    </AppBar>
   )
 }
 

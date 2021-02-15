@@ -46,7 +46,11 @@ const App = () => {
           />
           <Route path='/login' component={LoginScreen} />
           <Route path='/register' component={RegisterScreen} />
-          <Route path='/' component={Dashboard} exact />
+          <Route
+            path='/'
+            render={(e) => <Dashboard {...e} socket={socket} />}
+            exact
+          />
         </Container>
       </main>
     </Router>

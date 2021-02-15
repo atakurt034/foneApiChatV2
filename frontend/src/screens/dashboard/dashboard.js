@@ -27,7 +27,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever'
 
 import { Confirm, FormDialog } from '../../components/dialog'
 
-const Handler = ({ history }) => {
+const Handler = ({ history, socket }) => {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const theme = useTheme()
@@ -136,6 +136,20 @@ const Handler = ({ history }) => {
     name,
     dispatch,
   ])
+
+  const [datas, setDatas] = React.useState([])
+
+  React.useEffect(() => {
+    if (socket) {
+      socket.on('publicJoin', (data) => {
+        setDatas(Object.keys(data))
+      })
+      socket.on('publicLeave', (data) => {
+        setDatas(Object.keys(data))
+      })
+    }
+  }, [socket, datas])
+  console.log(datas)
 
   const clickHandler = (id) => {
     history.push(`/chatroom/${id}`)
@@ -249,7 +263,7 @@ const Handler = ({ history }) => {
                     padding: 10,
                   }}
                 >
-                  Chatrooms
+                  Public Chatrooms
                 </Typography>
               </Grid>
               <Paper
@@ -285,8 +299,15 @@ const Handler = ({ history }) => {
                         }}
                         key={chatroom._id}
                       >
-                        <Grid container justify='center' alignItems='center'>
-                          <Grid item xs={8} md={6}>
+                        <Grid
+                          container
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Grid item xs={8} md={4}>
                             <Typography
                               variant='h6'
                               style={{ textAlign: 'center' }}
@@ -320,14 +341,22 @@ const Handler = ({ history }) => {
                             alignItems='center'
                             xs={6}
                             sm={6}
-                            lg={2}
+                            md={4}
                           >
                             <Typography
                               variant='caption'
                               style={{ padding: 5 }}
                             >
-                              {` ${chatroom.users.length}  ${
-                                chatroom.users.length > 1 ? 'users' : 'user'
+                              {`${
+                                datas.filter(
+                                  (data) => data.split(',')[0] === chatroom._id
+                                ).length
+                              } ${
+                                datas.filter(
+                                  (data) => data.split(',')[0] === chatroom._id
+                                ).length > 1
+                                  ? 'users online'
+                                  : 'user online'
                               }`}
                             </Typography>
                           </Grid>
@@ -383,10 +412,10 @@ const Handler = ({ history }) => {
   )
 }
 
-export const Dashboard = (props) => {
+export const Dashboard = ({ socket, history }) => {
   return (
     <SnackbarProvider maxSnack={6}>
-      <Handler {...props} />
+      <Handler socket={socket} history={history} />
     </SnackbarProvider>
   )
 }

@@ -19,7 +19,6 @@ const useStyles = makeStyles({
 })
 
 export const UserDrawer = ({ userList, open, close }) => {
-  console.log(userList)
   const classes = useStyles()
 
   const list = (

@@ -71,13 +71,12 @@ export const getMessages = asyncHandler(async (req, res) => {
 
 export const deleteChatroom = asyncHandler(async (req, res) => {
   const id = req.params.id
-  const room = await Chatroom.findById(id)
-  const deleted = await Chatroom.deleteOne(room)
+  const deleted = await Chatroom.findByIdAndDelete(id)
   if (deleted) {
     res.status(202)
     res.json({ status: 202 })
   } else {
-    res.status(204)
+    res.status(404)
     throw new Error('Delete Failed')
   }
 })

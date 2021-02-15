@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -30,6 +31,7 @@ import axios from 'axios'
 import { Skeleton } from '@material-ui/lab'
 
 import { useStyles } from './styles'
+import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 
 const Chat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
@@ -60,10 +62,14 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
   const chatroomId = match.params.id
 
   const scrollToBottom = () => {
-    myRef.current.scrollIntoView({
-      behavior: 'smooth',
-      block: 'end',
-    })
+    if (myRef.current) {
+      myRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+      })
+    } else {
+      return
+    }
   }
 
   useEffect(() => {
@@ -234,7 +240,28 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
 
       <Grid item xs={12} sm={8} style={{ margin: 'auto' }}>
         <Card elevation={12} className={classes.card}>
-          <CardHeader title={chatname} subheader={new Date().toDateString()} />
+          <Grid container alignItems='center'>
+            <Grid item xs={8}>
+              <CardHeader
+                title={chatname}
+                subheader={new Date().toDateString()}
+              />
+            </Grid>
+            <Grid item xs={4} style={{ textAlign: 'center' }}>
+              {sm ? (
+                <IconButton onClick={() => history.push('/')}>
+                  <ExitToAppIcon />
+                </IconButton>
+              ) : (
+                <Button
+                  startIcon={<ExitToAppIcon />}
+                  onClick={() => history.push('/')}
+                >
+                  Dashboard
+                </Button>
+              )}
+            </Grid>
+          </Grid>
           <CardContent style={{ height: '50vh', overflow: 'hidden' }}>
             <Paper
               variant='outlined'
