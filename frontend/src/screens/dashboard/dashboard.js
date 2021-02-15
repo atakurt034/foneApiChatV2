@@ -149,7 +149,6 @@ const Handler = ({ history, socket }) => {
       })
     }
   }, [socket, datas])
-  console.log(datas)
 
   const clickHandler = (id) => {
     history.push(`/chatroom/${id}`)

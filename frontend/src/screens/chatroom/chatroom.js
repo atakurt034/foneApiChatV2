@@ -136,7 +136,11 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
   useEffect(() => {
     if (socket) {
       socket.on('joinRoom', ({ name, users }) => {
-        setUserList(Object.values(users))
+        const use = Object.keys(users).map(
+          (key) => key.split(',')[0] === chatroomId && key.split(',')[1]
+        )
+
+        setUserList(use)
         enqueueSnackbar(`${name} entered`, {
           anchorOrigin: {
             vertical: 'top',
@@ -148,7 +152,11 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
       })
 
       socket.on('leaveRoom', ({ name, users }) => {
-        setUserList(Object.values(users))
+        const use = Object.keys(users).map(
+          (key) => key.split(',')[0] === chatroomId && key.split(',')[1]
+        )
+
+        setUserList(use)
         enqueueSnackbar(`${name} left`, {
           anchorOrigin: {
             vertical: 'top',
@@ -163,9 +171,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
         dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
       })
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket])
+  }, [chatroomId, socket, dispatch, enqueueSnackbar])
 
   const clickHandler = () => {
     if (socket) {

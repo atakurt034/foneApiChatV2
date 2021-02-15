@@ -74,11 +74,14 @@ io.on('connect', (socket) => {
     if (!userExist) {
       chatroom.users.push(user)
     }
-    users[socket.userId] = user.name
+    users[chatroomId + ',' + user.name] = user.name
     rooms[chatroomId + ',' + user._id] = user._id
     socket.join(chatroomId)
 
-    io.to(chatroomId).emit('joinRoom', { name: user.name, users })
+    io.to(chatroomId).emit('joinRoom', {
+      name: user.name,
+      users,
+    })
     io.emit('publicJoin', rooms)
     await chatroom.save()
   })
@@ -86,10 +89,13 @@ io.on('connect', (socket) => {
   socket.on('leaveRoom', async ({ chatroomId }) => {
     const user = await User.findOne({ _id: socket.userId })
 
-    delete users[socket.userId]
+    delete users[chatroomId + ',' + user.name]
     delete rooms[chatroomId + ',' + user._id]
 
-    io.to(chatroomId).emit('leaveRoom', { name: user.name, users })
+    io.to(chatroomId).emit('leaveRoom', {
+      name: user.name,
+      users,
+    })
     io.emit('publicLeave', rooms)
     socket.leave(chatroomId)
   })
