@@ -32,6 +32,8 @@ import { Skeleton } from '@material-ui/lab'
 
 import { useStyles } from './styles'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
+import ListIcon from '@material-ui/icons/List'
+import { UserDrawer } from '../../components/drawer'
 
 const Chat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
@@ -194,6 +196,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [limit, setLimit] = useState(10)
   const [showOld, setShowOld] = useState(true)
+  const [open, setOpen] = useState(false)
 
   const loadOldHandler = async () => {
     setIsLoading(true)
@@ -238,7 +241,9 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
           >
             <Typography variant='h6'>Online Users</Typography>
             {userList.map((user, index) => (
-              <p key={index}>{user}</p>
+              <div key={index}>
+                <Button variant='text'>{user}</Button>
+              </div>
             ))}
           </Paper>
         </Grid>
@@ -255,9 +260,19 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
             </Grid>
             <Grid item xs={4} style={{ textAlign: 'center' }}>
               {sm ? (
-                <IconButton onClick={() => history.push('/')}>
-                  <ExitToAppIcon />
-                </IconButton>
+                <>
+                  <IconButton onClick={() => setOpen(true)}>
+                    <ListIcon />
+                  </IconButton>
+                  <IconButton onClick={() => history.push('/')} title='exit'>
+                    <ExitToAppIcon />
+                  </IconButton>
+                  <UserDrawer
+                    userList={userList}
+                    close={() => setOpen(false)}
+                    open={open}
+                  />
+                </>
               ) : (
                 <Button
                   startIcon={<ExitToAppIcon />}
