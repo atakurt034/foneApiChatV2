@@ -34,6 +34,7 @@ import { useStyles } from './styles'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 import ListIcon from '@material-ui/icons/List'
 import { UserDrawer } from '../../components/drawer'
+import { UserMenu } from '../../components/user/userMenu'
 
 const Chat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
@@ -139,7 +140,11 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
     if (socket) {
       socket.on('joinRoom', ({ name, users }) => {
         const use = Object.keys(users).map(
-          (key) => key.split(',')[0] === chatroomId && key.split(',')[1]
+          (key) =>
+            key.split(',')[0] === chatroomId && {
+              name: key.split(',')[1],
+              id: key.split(',')[2],
+            }
         )
 
         setUserList(use)
@@ -155,7 +160,11 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
 
       socket.on('leaveRoom', ({ name, users }) => {
         const use = Object.keys(users).map(
-          (key) => key.split(',')[0] === chatroomId && key.split(',')[1]
+          (key) =>
+            key.split(',')[0] === chatroomId && {
+              name: key.split(',')[1],
+              id: key.split(',')[2],
+            }
         )
 
         setUserList(use)
@@ -242,7 +251,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
             <Typography variant='h6'>Online Users</Typography>
             {userList.map((user, index) => (
               <div key={index}>
-                <Button variant='text'>{user}</Button>
+                <UserMenu history={history} user={user} />
               </div>
             ))}
           </Paper>

@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useStyles, StyledBadge } from './acStyle'
+import { useStyles, StyledBadge, StyledMenu, StyledMenuItem } from './acStyle'
 import {
   Button,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
   useMediaQuery,
@@ -18,43 +15,13 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 import PersonIcon from '@material-ui/icons/Person'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 import HomeIcon from '@material-ui/icons/Home'
+import ContactsIcon from '@material-ui/icons/Contacts'
 
 import { Admin } from './Admin'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { UA } from '../../../actions/index'
 import { MyRooms } from '../StyledMyRooms'
-
-const StyledMenu = withStyles({
-  paper: {
-    border: '1px solid #d3d4d5',
-  },
-})((props) => (
-  <Menu
-    elevation={0}
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'center',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'center',
-    }}
-    {...props}
-  />
-))
-
-const StyledMenuItem = withStyles((theme) => ({
-  root: {
-    '&:focus': {
-      backgroundColor: theme.palette.primary.main,
-      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: theme.palette.common.white,
-      },
-    },
-  },
-}))(MenuItem)
 
 export const Account = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -146,7 +113,7 @@ export const Account = () => {
             <ListItemText primary='Profile' />
           </Link>
         </StyledMenuItem>
-        {userInfo && userInfo.isAdmin && <Admin />}
+
         <StyledMenuItem onClick={handleClose}>
           <Link className={classes.link} to='/rooms/id'>
             <ListItemIcon>
@@ -155,6 +122,15 @@ export const Account = () => {
             <ListItemText primary='My Rooms' />
           </Link>
         </StyledMenuItem>
+        <StyledMenuItem onClick={handleClose}>
+          <Link className={classes.link} to='/rooms/id'>
+            <ListItemIcon>
+              <ContactsIcon />
+            </ListItemIcon>
+            <ListItemText primary='Contacts' />
+          </Link>
+        </StyledMenuItem>
+        {userInfo && userInfo.isAdmin && <Admin />}
         <StyledMenuItem onClick={logoutHandler}>
           <ListItemIcon>
             <ExitToAppIcon fontSize='small' />
