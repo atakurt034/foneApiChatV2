@@ -62,6 +62,9 @@ const Handler = ({ history, socket }) => {
   }
 
   React.useEffect(() => {
+    if (!userInfo) {
+      history.push('/login')
+    }
     if (userInfo) {
       dispatch(CA.getRooms())
     }
@@ -90,7 +93,7 @@ const Handler = ({ history, socket }) => {
               vertical: 'top',
               horizontal: 'right',
             },
-            variant: 'error',
+            variant: 'info',
             autoHideDuration: 3000,
             onEntered: () => {
               dispatch(CA.getRooms())
@@ -179,7 +182,7 @@ const Handler = ({ history, socket }) => {
     setEditData({ id, chatroomName })
   }
 
-  return loading || loadingUser ? (
+  return loading || loadingUser || !userInfo ? (
     <ModalLoader />
   ) : (
     <Container

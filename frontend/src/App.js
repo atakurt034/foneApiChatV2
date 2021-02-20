@@ -5,6 +5,8 @@ import { Chatroom } from './screens/chatroom/chatroom'
 import { LoginScreen } from './screens/LoginScreen/LoginScreen'
 import { RegisterScreen } from './screens/RegisterScreen/RegisterScreen'
 import { Dashboard } from './screens/dashboard/dashboard'
+import { UserChat } from './screens/userChatroom/user'
+import { Profile } from './screens/profile/profile'
 
 import { io } from 'socket.io-client'
 
@@ -34,6 +36,17 @@ const App = () => {
       <main>
         <Container>
           <Route
+            path='/user/:id'
+            render={(e) => (
+              <UserChat
+                {...e}
+                socket={socket}
+                sendChatroomId={(e) => setChatroomId(e)}
+              />
+            )}
+            exact
+          />
+          <Route
             path='/chatroom/:id'
             render={(e) => (
               <Chatroom
@@ -44,6 +57,7 @@ const App = () => {
             )}
             exact
           />
+          <Route path='/profile' component={Profile} exact />
           <Route path='/login' component={LoginScreen} />
           <Route path='/register' component={RegisterScreen} />
           <Route

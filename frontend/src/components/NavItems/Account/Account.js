@@ -19,18 +19,19 @@ import ContactsIcon from '@material-ui/icons/Contacts'
 
 import { Admin } from './Admin'
 import { useSelector, useDispatch } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import { UA } from '../../../actions/index'
 import { MyRooms } from '../StyledMyRooms'
+import { ModalLoader } from '../../ModalLoader'
 
-export const Account = () => {
+const Account = ({ history }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const theme = useTheme()
   const sm = useMediaQuery(theme.breakpoints.up('md'))
   const classes = useStyles()
 
-  const userLogin = useSelector((state) => state.userLogin)
-  const { userInfo } = userLogin
+  const { userInfo, loading, logout } = useSelector((state) => state.userLogin)
 
   const dispatch = useDispatch()
 
@@ -65,6 +66,12 @@ export const Account = () => {
       />
     </StyledBadge>
   )
+
+  React.useEffect(() => {
+    if (logout) {
+      history.push('/login')
+    }
+  }, [history, logout])
 
   const logged = (
     <>
@@ -141,5 +148,7 @@ export const Account = () => {
     </>
   )
 
-  return logged
+  return loading || typeof window === 'undefined' ? <ModalLoader /> : logged
 }
+
+export default withRouter(Account)

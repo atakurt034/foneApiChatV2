@@ -21,7 +21,7 @@ import { Skeleton } from '@material-ui/lab'
 import { UserDrawer } from './drawer'
 import ListIcon from '@material-ui/icons/List'
 
-import { Account } from './NavItems/Account/Account'
+import Account from './NavItems/Account/Account'
 
 const useStyles = makeStyles((theme) => ({
   root: {

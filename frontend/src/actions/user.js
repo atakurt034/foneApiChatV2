@@ -27,9 +27,9 @@ export const login = (email) => async (dispatch, getState) => {
 export const logout = () => {
   return async (dispatch, getState) => {
     try {
+      dispatch({ type: USER.LOGIN_REQUEST })
       localStorage.removeItem('userInfo')
       dispatch({ type: USER.LOGOUT })
-      document.location.href = '/login'
     } catch (err) {
       console.error(err)
     }
@@ -51,6 +51,34 @@ export const register = (user) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: USER.REGISTER_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}
+
+export const getUserDetails = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: USER.DETAILS_REQUEST })
+
+    const {
+      userLogin: { userInfo },
+    } = getState()
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    }
+
+    const { data } = await axios.get(`/api/users/profile`, config)
+    dispatch({ type: USER.DETAILS_SUCCESS, payload: data })
+  } catch (error) {
+    dispatch({
+      type: USER.DETAILS_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

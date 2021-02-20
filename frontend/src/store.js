@@ -7,6 +7,7 @@ import { USER, CHAT } from './reducers/index'
 const reducer = combineReducers({
   userLogin: USER.loginReducer,
   userRegister: USER.registerReducer,
+  userDetails: USER.userDetailsReducer,
   getRooms: CHAT.getRoomsReducer,
   createRoom: CHAT.createRoomsReducer,
   getRoomDetails: CHAT.getRoomDetailsReducer,
