@@ -10,7 +10,6 @@ import {
   Button,
   TextField,
   Container,
-  CardMedia,
   Avatar,
 } from '@material-ui/core'
 

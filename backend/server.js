@@ -100,7 +100,9 @@ io.on('connect', (socket) => {
   socket.on('leaveRoom', async ({ chatroomId }) => {
     const user = await User.findOne({ _id: socket.userId })
 
-    delete users[chatroomId + ',' + user.name + ',' + user._id]
+    delete users[
+      chatroomId + ',' + user.name + ',' + user._id + ',' + user.image
+    ]
     delete rooms[chatroomId + ',' + user._id]
 
     io.to(chatroomId).emit('leaveRoom', {
@@ -111,22 +113,25 @@ io.on('connect', (socket) => {
     socket.leave(chatroomId)
   })
 
-  socket.on('input', async ({ message, chatroomId, id }) => {
+  socket.on('input', async ({ message, name, image, chatroomId }) => {
     if (message.trim().length > 0) {
-      const user = await User.findOne({ _id: socket.userId })
+      const id = socket.userId
+      const user = await User.findById(id)
       const chatroom = await Chatroom.findById(chatroomId)
       const newMessage = await Message.create({
         message,
         user,
-        chatroom: chatroomId,
+        chatroomId,
       })
 
       chatroom.messages.push(newMessage)
 
       io.to(chatroomId).emit('output', {
         message,
-        name: user.name,
-        id,
+        name,
+        image: user.image,
+        chatroomId,
+        id: socket.userId,
       })
       await chatroom.save()
     }

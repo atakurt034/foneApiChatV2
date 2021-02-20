@@ -1,10 +1,12 @@
 import {
+  Avatar,
   Box,
   Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
   Grid,
   IconButton,
   InputBase,
@@ -96,6 +98,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
           {
             message: i.message,
             name: i.user.name,
+            image: i.user.image,
             isSender: i.user._id === userInfo._id,
           },
         ])
@@ -165,6 +168,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
             key.split(',')[0] === chatroomId && {
               name: key.split(',')[1],
               id: key.split(',')[2],
+              image: key.split(',')[3],
             }
         )
 
@@ -189,8 +193,9 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
     if (socket) {
       socket.emit('input', {
         message: textRef.current.value,
+        name: userInfo.name,
+        image: userInfo.image,
         chatroomId,
-        id: userInfo._id,
       })
       textRef.current.value = ''
     }
@@ -357,10 +362,31 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                         width: '80%',
                       }}
                     >
-                      <Typography variant='body1' className={classes.text}>
-                        {text.user.name.split(' ')[0]}
-                      </Typography>
-                      <Typography variant='body2' className={classes.text}>
+                      {!text.isSender && (
+                        <IconButton size='small' disableRipple>
+                          <Chip
+                            variant='outlined'
+                            label={
+                              text.user.name && text.user.name.split(' ')[0]
+                            }
+                            size='small'
+                            avatar={
+                              <Avatar
+                                src={text.user.image}
+                                alt={text.user.name}
+                              />
+                            }
+                            style={{ border: 'none', margin: 0, padding: 0 }}
+                          />
+                        </IconButton>
+                      )}
+
+                      <Typography
+                        variant='body2'
+                        className={
+                          text.isSender ? classes.textSender : classes.text
+                        }
+                      >
                         {text.message}
                       </Typography>
                     </Paper>
@@ -376,10 +402,29 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                     }
                     style={{ padding: '5px 0', margin: '10px 0', width: '80%' }}
                   >
-                    <Typography variant='body1' className={classes.text}>
-                      {text.name.split(' ')[0]}
-                    </Typography>
-                    <Typography variant='body2' className={classes.text}>
+                    {!text.isSender && (
+                      <Chip
+                        clickable
+                        disableRipple
+                        variant='outlined'
+                        label={text.name && text.name.split(' ')[0]}
+                        size='small'
+                        avatar={
+                          <Avatar
+                            src={text.image && text.image}
+                            alt={text.name}
+                          />
+                        }
+                        style={{ border: 'none', margin: 0, padding: 0 }}
+                      />
+                    )}
+
+                    <Typography
+                      variant='body2'
+                      className={
+                        text.isSender ? classes.textSender : classes.text
+                      }
+                    >
                       {text.message}
                     </Typography>
                   </Paper>

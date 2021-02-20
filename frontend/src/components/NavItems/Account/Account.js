@@ -27,13 +27,18 @@ import { ModalLoader } from '../../ModalLoader'
 
 const Account = ({ history }) => {
   const [anchorEl, setAnchorEl] = useState(null)
+  const dispatch = useDispatch()
   const theme = useTheme()
   const sm = useMediaQuery(theme.breakpoints.up('md'))
   const classes = useStyles()
 
   const { userInfo, loading, logout } = useSelector((state) => state.userLogin)
+  const { details, loading: loadingDetails } = useSelector(
+    (state) => state.userDetails
+  )
+  const { status } = useSelector((state) => state.userUpdate)
 
-  const dispatch = useDispatch()
+  const [{ name, image }, setUser] = React.useState({})
 
   const handleClick = (event) => {
     event.preventDefault()
@@ -61,18 +66,27 @@ const Account = ({ history }) => {
       variant='dot'
     >
       <Avatar
-        src={userInfo ? userInfo.image : ''}
-        alt={userInfo ? userInfo.name.split(' ')[0] : ''}
+        src={userInfo ? image : ''}
+        alt={userInfo ? name : ''}
         className={classes.avatar}
       />
     </StyledBadge>
   )
+  React.useEffect(() => {
+    if (userInfo) {
+      dispatch(UA.getUserDetails())
+    }
+  }, [userInfo, dispatch])
 
   React.useEffect(() => {
     if (logout) {
       history.push('/login')
     }
-  }, [history, logout])
+
+    if (details || status === 200) {
+      setUser({ name: details.name.split(' ')[0], image: details.image })
+    }
+  }, [history, logout, status, details])
 
   const logged = (
     <>
@@ -88,7 +102,7 @@ const Account = ({ history }) => {
         >
           <Typography variant='caption'>
             {userInfo ? (
-              userInfo.name.split(' ')[0]
+              name
             ) : (
               <Typography style={{ fontWeight: 600 }} variant='caption'>
                 LOGIN
@@ -149,7 +163,11 @@ const Account = ({ history }) => {
     </>
   )
 
-  return loading || typeof window === 'undefined' ? <ModalLoader /> : logged
+  return loading || loadingDetails || typeof window === 'undefined' ? (
+    <ModalLoader />
+  ) : (
+    logged
+  )
 }
 
 export default withRouter(Account)

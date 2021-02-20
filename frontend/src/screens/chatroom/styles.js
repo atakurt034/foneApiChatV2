@@ -23,7 +23,9 @@ export const useStyles = makeStyles(() => ({
     textAlign: 'right',
     float: 'right',
     clear: 'both',
+    height: 40,
   },
   reciever: { textAlign: 'left', float: 'left' },
   text: { margin: '0 10px' },
+  textSender: { margin: '10px' },
 }))
