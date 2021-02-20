@@ -15,16 +15,36 @@ import {
 
 import { useDispatch, useSelector } from 'react-redux'
 import { UA } from '../../actions/index'
+import { USER as UC } from '../../constants/index'
 
 import { ModalLoader } from '../../components/ModalLoader'
 import { ModalMessage } from '../../components/ModalMessage'
+import Toast from '../../components/Toast'
 
 export const Profile = () => {
   const dispatch = useDispatch()
 
   const { details, loading, error } = useSelector((state) => state.userDetails)
+  const { status, loading: loadingUpdate, error: errorUpadate } = useSelector(
+    (state) => state.userUpdate
+  )
 
   const [user, setUser] = React.useState({})
+  const { name, email, image, password, confirmPassword } = user
+
+  const submitHandler = (event) => {
+    event.preventDefault()
+    if (password === confirmPassword) {
+      dispatch(UA.userUpdateProfile({ name, image, email, password }))
+    } else {
+      Toast('error', 'Passwords do not match', 'notification')
+    }
+  }
+
+  const changeHandler = (event) => {
+    const { name, value } = event.target
+    setUser({ ...user, [name]: value })
+  }
 
   React.useEffect(() => {
     if (!details) {
@@ -33,12 +53,19 @@ export const Profile = () => {
     if (details) {
       setUser(details)
     }
-  }, [dispatch, details])
+    if (status === 200) {
+      Toast('success', 'Updated', 'notification')
+      dispatch(UA.getUserDetails())
+      dispatch({ type: UC.UPDATE_RESET })
+    }
+  }, [dispatch, details, status])
 
-  return loading ? (
+  return loading || loadingUpdate ? (
     <ModalLoader />
   ) : error ? (
     <ModalMessage variant='erro'>{error}</ModalMessage>
+  ) : errorUpadate ? (
+    <ModalMessage variant='error'>{errorUpadate}</ModalMessage>
   ) : (
     <Grid justify='center' style={{ margin: '20px auto', padding: 10 }}>
       <Grid item xs={12}>
@@ -46,26 +73,15 @@ export const Profile = () => {
           <CardHeader title='Info' />
           <Divider />
           <CardContent style={{ textAlign: 'center' }}>
-            <input
-              type='file'
-              id='imageInput'
-              accept='image/*'
-              style={{
-                // position: 'absolute',
-                // zIndex: 2,
-                // width: '20vw',
-                // height: '20vw',
-                display: 'none',
-              }}
-            />
+            <input type='file' id='imageInput' accept='image/*' hidden />
             <label htmlFor='imageInput'>
               <Button
                 style={{ height: '20vw', width: '20vw', borderRadius: '50%' }}
                 component='span'
               >
                 <Avatar
-                  src={user.image}
-                  alt={user.name}
+                  src={image}
+                  alt={name}
                   style={{
                     height: '20vw',
                     width: '20vw',
@@ -77,7 +93,7 @@ export const Profile = () => {
           </CardContent>
           <CardActions>
             <Container maxWidth='sm' style={{ margin: '5px auto' }}>
-              <form>
+              <form onSubmit={submitHandler}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextField
@@ -87,8 +103,8 @@ export const Profile = () => {
                       fullWidth
                       id='name'
                       label='Name'
-                      value={user.name}
-                      onChange={(e) => setUser({ name: e.target.value })}
+                      value={name}
+                      onChange={changeHandler}
                     />
                   </Grid>
 
@@ -100,31 +116,30 @@ export const Profile = () => {
                       id='email'
                       label='Email Address'
                       name='email'
-                      value={user.email}
-                      onChange={(e) => setUser({ email: e.target.value })}
+                      value={email}
+                      onChange={changeHandler}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
                       variant='outlined'
-                      required
                       fullWidth
                       name='password'
                       label='Password'
                       type='password'
                       id='password'
-                      autoComplete='current-password'
+                      onChange={changeHandler}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
                       variant='outlined'
-                      required
                       fullWidth
                       name='confirmPassword'
                       label='Confrim Password'
                       type='password'
                       id='confirmPassword'
+                      onChange={changeHandler}
                     />
                   </Grid>
                   <Grid item container justify='center' xs={12}>

@@ -5,7 +5,7 @@ import generateToken from '../utils/generateTokens.js'
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access   Public
-const authUser = asyncHandler(async (req, res) => {
+export const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
   const user = await User.findOne({ email })
@@ -27,7 +27,7 @@ const authUser = asyncHandler(async (req, res) => {
 // @desc    Register a new user
 // @route   POST /api/users
 // @access  Public
-const registerUser = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
 
   try {
@@ -55,7 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
 // @desc    Get user profile
 // @route   GET /api/users/login
 // @access   Private
-const getUserProfile = asyncHandler(async (req, res) => {
+export const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id)
 
   if (user) {
@@ -72,4 +72,19 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
 })
 
-export { authUser, registerUser, getUserProfile }
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    user.name = req.body.name
+    user.image = req.body.image
+    user.email = req.body.email
+    if (req.body.password) {
+      user.password = req.body.password
+    }
+    await user.save()
+    res.json({ status: 200 })
+  } catch (error) {
+    res.status(404)
+    throw new Error(error)
+  }
+})
