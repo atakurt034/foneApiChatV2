@@ -9,6 +9,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 import { useSelector } from 'react-redux'
 
 import { useStyles, StyledMenu, StyledMenuItem } from './style'
+import { Avatar } from '@material-ui/core'
 
 export const UserMenu = ({ user, history }) => {
   const classes = useStyles()
@@ -42,6 +43,11 @@ export const UserMenu = ({ user, history }) => {
         variant='text'
         className={active ? classes.active : classes.inactive}
       >
+        <Avatar
+          src={user.image}
+          alt={user.name}
+          style={{ margin: '5px 5px 5px 0' }}
+        />{' '}
         {user.name}
       </Button>
 

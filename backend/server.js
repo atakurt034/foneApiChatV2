@@ -1,6 +1,7 @@
 import express from 'express'
 import { connectDB } from './config/db.js'
 import dotenv from 'dotenv'
+import path from 'path'
 
 import { createServer } from 'http'
 import { Server } from 'socket.io'
@@ -26,11 +27,23 @@ if (process.env.NODE_ENV === 'development') {
 connectDB()
 
 // routes
-app.get('/', (req, res) => {
-  res.send('hello')
-})
 app.use('/api/users', user)
 app.use('/api/chatrooms', chatroom)
+
+const __dirname = path.resolve()
+app.use(express.static(path.join(__dirname, '/uploads')))
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '/frontend/build')))
+
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
+  )
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running....')
+  })
+}
 
 // error handlers
 app.use(errorHandler)
@@ -71,7 +84,8 @@ io.on('connect', (socket) => {
     if (!userExist) {
       chatroom.users.push(user)
     }
-    users[chatroomId + ',' + user.name + ',' + user._id] = user.name
+    users[chatroomId + ',' + user.name + ',' + user._id + ',' + user.image] =
+      user.name
     rooms[chatroomId + ',' + user._id] = user._id
     socket.join(chatroomId)
 

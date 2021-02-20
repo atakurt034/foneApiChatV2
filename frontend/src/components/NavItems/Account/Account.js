@@ -61,6 +61,7 @@ const Account = ({ history }) => {
       variant='dot'
     >
       <Avatar
+        src={userInfo ? userInfo.image : ''}
         alt={userInfo ? userInfo.name.split(' ')[0] : ''}
         className={classes.avatar}
       />

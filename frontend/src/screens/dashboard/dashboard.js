@@ -281,7 +281,6 @@ const Handler = ({ history, socket }) => {
                 <Grid
                   container
                   justify='center'
-                  // alignItems='center'
                   spacing={2}
                   style={{
                     overflowY: 'auto',

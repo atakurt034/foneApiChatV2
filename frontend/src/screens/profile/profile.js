@@ -6,11 +6,12 @@ import {
   CardHeader,
   CardContent,
   CardActions,
-  Avatar,
   Divider,
   Button,
   TextField,
   Container,
+  CardMedia,
+  Avatar,
 } from '@material-ui/core'
 
 import { useDispatch, useSelector } from 'react-redux'
@@ -20,10 +21,12 @@ import { USER as UC } from '../../constants/index'
 import { ModalLoader } from '../../components/ModalLoader'
 import { ModalMessage } from '../../components/ModalMessage'
 import Toast from '../../components/Toast'
+import axios from 'axios'
 
 export const Profile = () => {
   const dispatch = useDispatch()
 
+  const { userInfo } = useSelector((state) => state.userLogin)
   const { details, loading, error } = useSelector((state) => state.userDetails)
   const { status, loading: loadingUpdate, error: errorUpadate } = useSelector(
     (state) => state.userUpdate
@@ -44,6 +47,33 @@ export const Profile = () => {
   const changeHandler = (event) => {
     const { name, value } = event.target
     setUser({ ...user, [name]: value })
+  }
+
+  const imageHandler = async (event) => {
+    event.preventDefault()
+    const file = event.target.files[0]
+    const form = new FormData()
+    form.append('file', file)
+
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    }
+
+    try {
+      const { data } = await axios.post(
+        `/api/users/uploads/avatar`,
+        form,
+        config
+      )
+      console.log(data)
+      const path = data.file.path.split('public')[1]
+      setUser({ ...user, image: path })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   React.useEffect(() => {
@@ -67,13 +97,23 @@ export const Profile = () => {
   ) : errorUpadate ? (
     <ModalMessage variant='error'>{errorUpadate}</ModalMessage>
   ) : (
-    <Grid justify='center' style={{ margin: '20px auto', padding: 10 }}>
+    <Grid
+      container
+      justify='center'
+      style={{ margin: '20px auto', padding: 10 }}
+    >
       <Grid item xs={12}>
         <Card elevation={12}>
           <CardHeader title='Info' />
           <Divider />
           <CardContent style={{ textAlign: 'center' }}>
-            <input type='file' id='imageInput' accept='image/*' hidden />
+            <input
+              type='file'
+              id='imageInput'
+              accept='image/*'
+              hidden
+              onChange={imageHandler}
+            />
             <label htmlFor='imageInput'>
               <Button
                 style={{ height: '20vw', width: '20vw', borderRadius: '50%' }}
@@ -94,7 +134,7 @@ export const Profile = () => {
           <CardActions>
             <Container maxWidth='sm' style={{ margin: '5px auto' }}>
               <form onSubmit={submitHandler}>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} style={{ padding: 20 }}>
                   <Grid item xs={12}>
                     <TextField
                       name='name'

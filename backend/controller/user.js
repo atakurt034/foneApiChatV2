@@ -2,6 +2,11 @@ import asyncHandler from 'express-async-handler'
 import User from '../models/user.js'
 import generateToken from '../utils/generateTokens.js'
 
+import slugify from 'slugify'
+import formidable from 'formidable'
+import path from 'path'
+import fs from 'fs'
+
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access   Public
@@ -14,6 +19,7 @@ export const authUser = asyncHandler(async (req, res) => {
     res.json({
       _id: user._id,
       name: user.name,
+      image: user.image,
       email: user.email,
       isAdmin: user.isAdmin,
       token: generateToken(user._id),
@@ -87,4 +93,38 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     res.status(404)
     throw new Error(error)
   }
+})
+
+export const updateAvatar = asyncHandler(async (req, res) => {
+  const timestamp = new Date().toISOString().slice(0, 10)
+  const __dirname = path.resolve()
+  const uploadFolder = path.join(
+    __dirname,
+    'frontend',
+    'public',
+    'uploads',
+    'avatar_images',
+    timestamp
+  )
+
+  fs.mkdir(uploadFolder, { recursive: true }, function (err) {
+    return console.log('dir ' + err)
+  })
+
+  const form = new formidable.IncomingForm()
+  form.multiples = false
+  form.maxFileSize = 30 * 1024 * 1024
+  form.uploadDir = uploadFolder
+  form.keepExtensions = true
+  form.on('fileBegin', (name, file) => {
+    file.path = path.join(uploadFolder, slugify(file.name + Date.now()))
+  })
+
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      console.log(err)
+    } else {
+      res.json(files)
+    }
+  })
 })

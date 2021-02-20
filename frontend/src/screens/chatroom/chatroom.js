@@ -144,6 +144,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
             key.split(',')[0] === chatroomId && {
               name: key.split(',')[1],
               id: key.split(',')[2],
+              image: key.split(',')[3],
             }
         )
 
