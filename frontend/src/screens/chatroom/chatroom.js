@@ -1,12 +1,10 @@
 import {
-  Avatar,
   Box,
   Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
-  Chip,
   Grid,
   IconButton,
   InputBase,
@@ -37,6 +35,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 import ListIcon from '@material-ui/icons/List'
 import { UserDrawer } from '../../components/drawer'
 import { UserMenu } from '../../components/user/userMenu'
+import { ChipUser, ChipUserOld } from '../../components/user/userChip'
 
 const Chat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
@@ -363,22 +362,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                       }}
                     >
                       {!text.isSender && (
-                        <IconButton size='small' disableRipple>
-                          <Chip
-                            variant='outlined'
-                            label={
-                              text.user.name && text.user.name.split(' ')[0]
-                            }
-                            size='small'
-                            avatar={
-                              <Avatar
-                                src={text.user.image}
-                                alt={text.user.name}
-                              />
-                            }
-                            style={{ border: 'none', margin: 0, padding: 0 }}
-                          />
-                        </IconButton>
+                        <ChipUserOld history={history} text={text} />
                       )}
 
                       <Typography
@@ -403,20 +387,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                     style={{ padding: '5px 0', margin: '10px 0', width: '80%' }}
                   >
                     {!text.isSender && (
-                      <Chip
-                        clickable
-                        disableRipple
-                        variant='outlined'
-                        label={text.name && text.name.split(' ')[0]}
-                        size='small'
-                        avatar={
-                          <Avatar
-                            src={text.image && text.image}
-                            alt={text.name}
-                          />
-                        }
-                        style={{ border: 'none', margin: 0, padding: 0 }}
-                      />
+                      <ChipUser history={history} text={text} />
                     )}
 
                     <Typography
