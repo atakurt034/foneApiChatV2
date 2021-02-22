@@ -9,7 +9,15 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 import { useSelector } from 'react-redux'
 
 import { useStyles, StyledMenu, StyledMenuItem } from './style'
-import { Avatar } from '@material-ui/core'
+import {
+  Avatar,
+  Card,
+  CardActionArea,
+  CardHeader,
+  Divider,
+  Grid,
+  Modal,
+} from '@material-ui/core'
 
 export const UserMenu = ({ user, history }) => {
   const classes = useStyles()
@@ -18,6 +26,7 @@ export const UserMenu = ({ user, history }) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [active, setActive] = React.useState(false)
+  const [open, setOpen] = React.useState(false)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -29,8 +38,19 @@ export const UserMenu = ({ user, history }) => {
     setActive(false)
   }
 
-  const messageHandler = () => {
-    history.push(`/user/${user.id}`)
+  const menuHandler = (type) => {
+    switch (type) {
+      case 'message':
+        history.push(`/user/${user.id}`)
+        handleClose()
+        break
+      case 'info':
+        setOpen(true)
+        handleClose()
+        break
+      default:
+        return type
+    }
   }
 
   return (
@@ -51,6 +71,45 @@ export const UserMenu = ({ user, history }) => {
         {user.name}
       </Button>
 
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Grid item xs={3} style={{ height: '20vh' }}>
+          <Card elevation={12}>
+            <Avatar
+              style={{
+                width: '5vw',
+                height: '5vw',
+                padding: 3,
+                borderRadius: '50%',
+                border: '2px solid #ccc',
+                margin: '10px auto 0',
+              }}
+              src={user.image}
+              alt={user.name}
+            />
+            <CardHeader style={{ textAlign: 'center' }} title={user.name} />
+            <Divider />
+            <CardActionArea
+              style={{
+                display: 'flex',
+                justifyContent: 'space-evenly',
+                padding: 10,
+              }}
+            >
+              <Button variant='contained'>Add to friends</Button>
+              <Button variant='contained'>Block</Button>
+            </CardActionArea>
+          </Card>
+        </Grid>
+      </Modal>
+
       <StyledMenu
         id='customized-menu'
         anchorEl={anchorEl}
@@ -58,13 +117,13 @@ export const UserMenu = ({ user, history }) => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <StyledMenuItem>
+        <StyledMenuItem onClick={() => menuHandler('info')}>
           <ListItemIcon>
             <PersonIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText primary='Info' />
         </StyledMenuItem>
-        <StyledMenuItem onClick={messageHandler}>
+        <StyledMenuItem onClick={() => menuHandler('message')}>
           <ListItemIcon>
             <MessageIcon fontSize='small' />
           </ListItemIcon>

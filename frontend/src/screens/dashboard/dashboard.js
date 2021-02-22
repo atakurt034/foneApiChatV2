@@ -219,7 +219,7 @@ const Handler = ({ history, socket }) => {
             >
               <form onSubmit={submitHandler}>
                 <TextField
-                  style={{ boxShadow: '2px 3px #ccc' }}
+                  style={{ boxShadow: '2px 3px #ccc', borderRadius: 5 }}
                   type='text'
                   variant='outlined'
                   margin='normal'
