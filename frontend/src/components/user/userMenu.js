@@ -13,6 +13,7 @@ import {
   Avatar,
   Card,
   CardActionArea,
+  CardActions,
   CardHeader,
   Divider,
   Grid,
@@ -117,20 +118,20 @@ export const UserMenu = ({ user, history, socket, chatroomId, closed }) => {
             />
             <CardHeader style={{ textAlign: 'center' }} title={user.name} />
             <Divider />
-            <CardActionArea
+            <CardActions
               style={{
                 display: 'flex',
                 justifyContent: 'space-evenly',
                 padding: 10,
               }}
             >
-              <Button size='small' variant='contained'>
+              <Button color='primary' size='small' variant='contained'>
                 Add to friends
               </Button>
-              <Button size='small' variant='contained'>
+              <Button color='secondary' size='small' variant='contained'>
                 Block
               </Button>
-            </CardActionArea>
+            </CardActions>
           </Card>
         </Grid>
       </Modal>

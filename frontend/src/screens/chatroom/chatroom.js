@@ -121,7 +121,10 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
       socket.on('output', (data) => {
         setResponse((prev) => [
           ...prev,
-          { ...data, isSender: data.id === userInfo._id },
+          {
+            ...data,
+            isSender: data.id === userInfo._id,
+          },
         ])
         scrollToBottom()
       })
@@ -239,6 +242,20 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
     if (data.length === oldMsg.length) {
       setShowOld(false)
     }
+  }
+
+  const arrayFilter = (array, type) => {
+    let index
+    const arrIndex = []
+    if (type === 'reciever') {
+      array.map((user, index) => !user.isSender && arrIndex.push(index))
+      index = arrIndex[arrIndex.length - 1]
+    } else {
+      array.map((user, index) => user.isSender && arrIndex.push(index))
+      index = arrIndex[arrIndex.length - 1]
+    }
+
+    return index
   }
 
   return loading || loadingRoom ? (
@@ -363,11 +380,6 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                       className={
                         text.isSender ? classes.sender : classes.reciever
                       }
-                      style={{
-                        padding: '5px 0',
-                        margin: '10px 0',
-                        width: '80%',
-                      }}
                     >
                       {!text.isSender && (
                         <ChipUserOld history={history} text={text} />
@@ -386,27 +398,44 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                 )}
 
                 {response.map((text, index) => (
-                  <Paper
-                    elevation={12}
-                    key={index}
-                    className={
-                      text.isSender ? classes.sender : classes.reciever
-                    }
-                    style={{ padding: '5px 0', margin: '10px 0', width: '80%' }}
-                  >
-                    {!text.isSender && (
-                      <ChipUser history={history} text={text} />
-                    )}
-
-                    <Typography
-                      variant='body2'
+                  <>
+                    <Paper
+                      elevation={12}
+                      key={index}
                       className={
-                        text.isSender ? classes.textSender : classes.text
+                        text.isSender
+                          ? arrayFilter(response, 'sender') === index
+                            ? classes.lastSender
+                            : classes.sender
+                          : arrayFilter(response, 'reciever') === index
+                          ? classes.lastReciever
+                          : classes.reciever
                       }
                     >
-                      {text.message}
-                    </Typography>
-                  </Paper>
+                      {!text.isSender && (
+                        <ChipUser history={history} text={text} />
+                      )}
+
+                      <Typography
+                        variant='body2'
+                        className={
+                          text.isSender ? classes.textSender : classes.text
+                        }
+                      >
+                        {text.message}
+                      </Typography>
+                    </Paper>
+                    {response.length === index + 1 && (
+                      <Box>
+                        <Typography
+                          variant='caption'
+                          style={{ height: 5, margin: 5 }}
+                        >
+                          {text.createdAt}
+                        </Typography>
+                      </Box>
+                    )}
+                  </>
                 ))}
 
                 <div

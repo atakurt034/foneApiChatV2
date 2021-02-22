@@ -11,6 +11,7 @@ import {
   Divider,
   CardActionArea,
   Button,
+  CardActions,
 } from '@material-ui/core'
 
 import PersonIcon from '@material-ui/icons/Person'
@@ -87,16 +88,20 @@ export const ChipUser = ({ text, history }) => {
             />
             <CardHeader style={{ textAlign: 'center' }} title={text.name} />
             <Divider />
-            <CardActionArea
+            <CardActions
               style={{
                 display: 'flex',
                 justifyContent: 'space-evenly',
                 padding: 10,
               }}
             >
-              <Button variant='contained'>Add to friends</Button>
-              <Button variant='contained'>Block</Button>
-            </CardActionArea>
+              <Button color='primary' variant='contained'>
+                Add to friends
+              </Button>
+              <Button color='secondary' variant='contained'>
+                Block
+              </Button>
+            </CardActions>
           </Card>
         </Grid>
       </Modal>
