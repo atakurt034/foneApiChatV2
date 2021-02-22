@@ -19,7 +19,7 @@ import {
   Modal,
 } from '@material-ui/core'
 
-export const UserMenu = ({ user, history, socket, chatroomId }) => {
+export const UserMenu = ({ user, history, socket, chatroomId, closed }) => {
   const classes = useStyles()
 
   const { userInfo } = useSelector((state) => state.userLogin)
@@ -33,7 +33,7 @@ export const UserMenu = ({ user, history, socket, chatroomId }) => {
     setActive(true)
   }
 
-  const handleClose = () => {
+  const handleClose = (e) => {
     setAnchorEl(null)
     setActive(false)
   }
@@ -101,7 +101,7 @@ export const UserMenu = ({ user, history, socket, chatroomId }) => {
           alignItems: 'center',
         }}
       >
-        <Grid item xs={3} style={{ height: '20vh' }}>
+        <Grid item xs={8} sm={3} style={{ height: '20vh' }}>
           <Card elevation={12}>
             <Avatar
               style={{
@@ -124,8 +124,12 @@ export const UserMenu = ({ user, history, socket, chatroomId }) => {
                 padding: 10,
               }}
             >
-              <Button variant='contained'>Add to friends</Button>
-              <Button variant='contained'>Block</Button>
+              <Button size='small' variant='contained'>
+                Add to friends
+              </Button>
+              <Button size='small' variant='contained'>
+                Block
+              </Button>
             </CardActionArea>
           </Card>
         </Grid>

@@ -2,15 +2,12 @@ import React from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
-import List from '@material-ui/core/List'
-import Divider from '@material-ui/core/Divider'
-import { Typography } from '@material-ui/core'
+import { UserMenu } from './user/userMenu'
 
 const useStyles = makeStyles({
   list: {
     width: 250,
-    padding: 20,
-    height: '75vh',
+    padding: `0 10px`,
     overflow: 'auto',
   },
   fullList: {
@@ -18,20 +15,31 @@ const useStyles = makeStyles({
   },
 })
 
-export const UserDrawer = ({ userList, open, close }) => {
+export const UserDrawer = ({
+  open,
+  close,
+  history,
+  userList,
+  chatroomId,
+  socket,
+}) => {
   const classes = useStyles()
 
-  const list = (
-    <div className={clsx(classes.list, classes.fullList)} role='presentation'>
-      <List>
-        <Typography variant='h6'>Online Users</Typography>
-        <Divider variant='middle' />
-        {userList.map((user, index) => (
-          <p key={index}>{user}</p>
-        ))}
-      </List>
+  const list = userList.map((user, index) => (
+    <div
+      key={index}
+      className={clsx(classes.list, classes.fullList)}
+      role='presentation'
+    >
+      <UserMenu
+        closed={close}
+        history={history}
+        user={user}
+        chatroomId={chatroomId}
+        socket={socket}
+      />
     </div>
-  )
+  ))
 
   return (
     <div>

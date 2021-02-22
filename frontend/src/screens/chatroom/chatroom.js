@@ -287,6 +287,9 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                     <ExitToAppIcon />
                   </IconButton>
                   <UserDrawer
+                    chatroomId={chatroomId}
+                    history={history}
+                    socket={socket}
                     userList={userList}
                     close={() => setOpen(false)}
                     open={open}
