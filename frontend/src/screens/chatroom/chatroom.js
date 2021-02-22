@@ -136,7 +136,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [socket, userInfo])
 
   useEffect(() => {
     if (socket) {
@@ -256,7 +256,12 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
             <Typography variant='h6'>Online Users</Typography>
             {userList.map((user, index) => (
               <div key={index}>
-                <UserMenu history={history} user={user} />
+                <UserMenu
+                  history={history}
+                  user={user}
+                  chatroomId={chatroomId}
+                  socket={socket}
+                />
               </div>
             ))}
           </Paper>

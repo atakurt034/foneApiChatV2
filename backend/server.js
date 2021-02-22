@@ -136,4 +136,7 @@ io.on('connect', (socket) => {
       await chatroom.save()
     }
   })
+  socket.on('kick', ({ user, chatroomId }) => {
+    io.to(chatroomId).emit('kicked', { user, chatroomId })
+  })
 })

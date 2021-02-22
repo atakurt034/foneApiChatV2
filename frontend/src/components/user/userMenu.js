@@ -19,7 +19,7 @@ import {
   Modal,
 } from '@material-ui/core'
 
-export const UserMenu = ({ user, history }) => {
+export const UserMenu = ({ user, history, socket, chatroomId }) => {
   const classes = useStyles()
 
   const { userInfo } = useSelector((state) => state.userLogin)
@@ -38,6 +38,22 @@ export const UserMenu = ({ user, history }) => {
     setActive(false)
   }
 
+  const handleKick = () => {
+    if (socket) {
+      socket.emit('kick', { user: user.id, chatroomId })
+    }
+  }
+  React.useEffect(() => {
+    if (socket) {
+      socket.on('kicked', (data) => {
+        if (data.user === userInfo._id && data.chatroomId === chatroomId) {
+          history.push('/')
+        }
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket])
+
   const menuHandler = (type) => {
     switch (type) {
       case 'message':
@@ -46,6 +62,11 @@ export const UserMenu = ({ user, history }) => {
         break
       case 'info':
         setOpen(true)
+        handleClose()
+        break
+
+      case 'kick':
+        handleKick()
         handleClose()
         break
       default:
@@ -130,7 +151,7 @@ export const UserMenu = ({ user, history }) => {
           <ListItemText primary='Message' />
         </StyledMenuItem>
         {userInfo && userInfo.isAdmin && (
-          <StyledMenuItem>
+          <StyledMenuItem onClick={() => menuHandler('kick')}>
             <ListItemIcon>
               <HighlightOffIcon fontSize='small' />
             </ListItemIcon>
