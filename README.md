@@ -10,8 +10,7 @@
 </ul>
 
 <p>npm run dev to run both client and server</p>
-
-
-
-
-
+<ul>Admin privileges on login 
+  <li>email: admin@example.com</li>
+  <li>password: 123</li>
+</ul>
