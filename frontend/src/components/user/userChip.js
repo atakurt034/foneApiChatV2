@@ -9,7 +9,6 @@ import {
   CardHeader,
   Grid,
   Divider,
-  CardActionArea,
   Button,
   CardActions,
 } from '@material-ui/core'
@@ -21,7 +20,7 @@ import { useSelector } from 'react-redux'
 
 import { StyledMenu, StyledMenuItem } from './style'
 
-export const ChipUser = ({ text, history }) => {
+export const ChipUser = ({ text, history, socket, chatroomId, closed }) => {
   const { userInfo } = useSelector((state) => state.userLogin)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -35,6 +34,13 @@ export const ChipUser = ({ text, history }) => {
     setAnchorEl(null)
   }
 
+  const handleKick = () => {
+    if (socket) {
+      socket.emit('kick', { user: text.id, chatroomId })
+    }
+    console.log(text)
+  }
+
   const menuHandler = (type) => {
     switch (type) {
       case 'message':
@@ -43,6 +49,10 @@ export const ChipUser = ({ text, history }) => {
         break
       case 'info':
         setOpen(true)
+        handleClose()
+        break
+      case 'kick':
+        handleKick()
         handleClose()
         break
       default:
@@ -126,7 +136,7 @@ export const ChipUser = ({ text, history }) => {
           <ListItemText primary='Message' />
         </StyledMenuItem>
         {userInfo && userInfo.isAdmin && (
-          <StyledMenuItem>
+          <StyledMenuItem onClick={() => menuHandler('kick')}>
             <ListItemIcon>
               <HighlightOffIcon fontSize='small' />
             </ListItemIcon>

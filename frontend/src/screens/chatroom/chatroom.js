@@ -101,6 +101,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
             name: i.user.name,
             image: i.user.image,
             isSender: i.user._id === userInfo._id,
+            id: i.user._id,
           },
         ])
       )
@@ -401,7 +402,12 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                       }
                     >
                       {!text.isSender && (
-                        <ChipUser history={history} text={text} />
+                        <ChipUser
+                          text={text}
+                          history={history}
+                          socket={socket}
+                          chatroomId={chatroomId}
+                        />
                       )}
 
                       <Typography

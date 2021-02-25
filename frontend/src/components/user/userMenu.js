@@ -12,7 +12,6 @@ import { useStyles, StyledMenu, StyledMenuItem } from './style'
 import {
   Avatar,
   Card,
-  CardActionArea,
   CardActions,
   CardHeader,
   Divider,
