@@ -145,10 +145,10 @@ const Handler = ({ history, socket }) => {
   React.useEffect(() => {
     if (socket) {
       socket.on('publicJoin', (data) => {
-        setDatas(Object.keys(data))
+        setDatas(Object.values(data))
       })
       socket.on('publicLeave', (data) => {
-        setDatas(Object.keys(data))
+        setDatas(Object.values(data))
       })
     }
   }, [socket, datas])
@@ -350,11 +350,11 @@ const Handler = ({ history, socket }) => {
                             >
                               {`${
                                 datas.filter(
-                                  (data) => data.split(',')[0] === chatroom._id
+                                  (data) => data.chatroomId === chatroom._id
                                 ).length
                               } ${
                                 datas.filter(
-                                  (data) => data.split(',')[0] === chatroom._id
+                                  (data) => data.chatroomId === chatroom._id
                                 ).length > 1
                                   ? 'users online'
                                   : 'user online'

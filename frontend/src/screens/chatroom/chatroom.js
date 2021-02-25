@@ -37,6 +37,8 @@ import { UserDrawer } from '../../components/drawer'
 import { UserMenu } from '../../components/user/userMenu'
 import { ChipUser, ChipUserOld } from '../../components/user/userChip'
 
+import { filter_room } from '../../lib/filters'
+
 const Chat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -144,14 +146,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
   useEffect(() => {
     if (socket) {
       socket.on('joinRoom', ({ name, users }) => {
-        const use = Object.keys(users).map(
-          (key) =>
-            key.split(',')[0] === chatroomId && {
-              name: key.split(',')[1],
-              id: key.split(',')[2],
-              image: key.split(',')[3],
-            }
-        )
+        const use = filter_room(users, chatroomId)
 
         setUserList(use)
         enqueueSnackbar(`${name} entered`, {
@@ -160,19 +155,12 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
             horizontal: 'right',
           },
           variant: 'success',
-          autoHideDuration: 1000,
+          autoHideDuration: 500,
         })
       })
 
       socket.on('leaveRoom', ({ name, users }) => {
-        const use = Object.keys(users).map(
-          (key) =>
-            key.split(',')[0] === chatroomId && {
-              name: key.split(',')[1],
-              id: key.split(',')[2],
-              image: key.split(',')[3],
-            }
-        )
+        const use = filter_room(users, chatroomId)
 
         setUserList(use)
         enqueueSnackbar(`${name} left`, {
@@ -181,7 +169,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
             horizontal: 'right',
           },
           variant: 'error',
-          autoHideDuration: 1000,
+          autoHideDuration: 500,
         })
         dispatch({ type: CHAT.CREATE_ROOM_RESET })
         dispatch({ type: CHAT.GET_MESSAGES_RESET })

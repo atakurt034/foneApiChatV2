@@ -68,7 +68,6 @@ io.use(async (socket, next) => {
 })
 
 const users = {}
-const rooms = {}
 
 // returns the union of two arrays where duplicate objects with the same 'prop' are removed
 
@@ -84,32 +83,29 @@ io.on('connect', (socket) => {
     if (!userExist) {
       chatroom.users.push(user)
     }
-    users[chatroomId + ',' + user.name + ',' + user._id + ',' + user.image] =
-      user.name
-    rooms[chatroomId + ',' + user._id] = user._id
+
+    users[socket.userId] = { ...user._doc, chatroomId }
+
     socket.join(chatroomId)
 
     io.to(chatroomId).emit('joinRoom', {
       name: user.name,
       users,
     })
-    io.emit('publicJoin', rooms)
+    io.emit('publicJoin', users)
     await chatroom.save()
   })
 
   socket.on('leaveRoom', async ({ chatroomId }) => {
     const user = await User.findOne({ _id: socket.userId })
 
-    delete users[
-      chatroomId + ',' + user.name + ',' + user._id + ',' + user.image
-    ]
-    delete rooms[chatroomId + ',' + user._id]
+    delete users[socket.userId]
 
     io.to(chatroomId).emit('leaveRoom', {
       name: user.name,
       users,
     })
-    io.emit('publicLeave', rooms)
+    io.emit('publicLeave', users)
     socket.leave(chatroomId)
   })
 
