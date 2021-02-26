@@ -154,7 +154,6 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
         dispatch({ type: CHAT.GET_MESSAGES_RESET })
         dispatch({ type: CHAT.GET_ROOMS_RESET })
         dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
-        dispatch({ type: CHAT.PRIVATE_MESSAGE_RESET })
 
         setUserList(use)
       })

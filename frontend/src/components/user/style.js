@@ -5,6 +5,7 @@ export const useStyles = makeStyles((theme) => ({
     textTransform: 'none',
     textDecoration: 'underline',
     justifyContent: 'left',
+    color: 'red',
   },
   inactive: {
     textTransform: 'none',

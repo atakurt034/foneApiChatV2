@@ -18,15 +18,14 @@ import {
   Grid,
   Modal,
 } from '@material-ui/core'
-import { CA } from '../../actions/index'
 import { USER } from '../../constants/index'
+import axios from 'axios'
 
 export const UserMenu = ({ user, history, socket, chatroomId }) => {
   const dispatch = useDispatch()
   const classes = useStyles()
 
   const { userInfo } = useSelector((state) => state.userLogin)
-  const { room } = useSelector((state) => state.privateMsg)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [active, setActive] = React.useState(false)
@@ -48,16 +47,32 @@ export const UserMenu = ({ user, history, socket, chatroomId }) => {
     }
   }
 
-  const handleMessage = () => {
-    dispatch(CA.privateMsg(user.id))
+  const handleMessage = async () => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      }
+      const { data } = await axios.post(
+        `/api/chatrooms/private/${userInfo.name}`,
+        { id: user.id },
+        config
+      )
+      history.push(`/user/${user.name}?id=${data._id}`)
+    } catch (error) {
+      console.log(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      )
+    }
   }
 
   React.useEffect(() => {
-    if (room) {
-      history.push(`/user/${user.name}?id=${room._id}`)
-      dispatch({ type: USER.PRIVATE_ROOMS_RESET })
-    }
-  }, [room, history, user, dispatch])
+    dispatch({ type: USER.PRIVATE_ROOMS_RESET })
+  }, [history, dispatch])
 
   React.useEffect(() => {
     if (socket) {

@@ -89,18 +89,3 @@ export const editRoomReducer = (state = {}, action) => {
       return state
   }
 }
-
-export const privateMsgReducer = (state = {}, action) => {
-  switch (action.type) {
-    case CHAT.PRIVATE_MESSAGE_REQUEST:
-      return { loading: true }
-    case CHAT.PRIVATE_MESSAGE_SUCCESS:
-      return { loading: false, room: action.payload }
-    case CHAT.PRIVATE_MESSAGE_FAIL:
-      return { loading: false, error: action.payload }
-    case CHAT.PRIVATE_MESSAGE_RESET:
-      return {}
-    default:
-      return state
-  }
-}

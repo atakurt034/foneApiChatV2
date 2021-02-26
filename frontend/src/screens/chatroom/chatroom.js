@@ -247,14 +247,13 @@ const Chat = ({ history, match, socket, sendChatroomId, setPrvtRoomId }) => {
           >
             <Typography variant='h6'>Online Users</Typography>
             {userList.map((user, index) => (
-              <div key={index}>
-                <UserMenu
-                  history={history}
-                  user={user}
-                  chatroomId={chatroomId}
-                  socket={socket}
-                />
-              </div>
+              <UserMenu
+                key={index}
+                history={history}
+                user={user}
+                chatroomId={chatroomId}
+                socket={socket}
+              />
             ))}
           </Paper>
         </Grid>

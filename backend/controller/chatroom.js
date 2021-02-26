@@ -112,7 +112,9 @@ export const createPrivateMsg = asyncHandler(async (req, res) => {
   const id1 = req.body.id
   const id2 = req.user._id
   const users = await User.find({ _id: { $in: [id1, id2] } })
-  const room = await PrivateRoom.findOne({ users: { $in: [id1, id2] } })
+  const room = await PrivateRoom.findOne({
+    $and: [{ users: id1 }, { users: id2 }],
+  })
 
   const [user1, user2] = users
 
