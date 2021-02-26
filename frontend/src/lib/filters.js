@@ -10,3 +10,17 @@ export const filter_room = (users, chatroomId) => {
     }))
   }
 }
+
+export const arrayFilter = (array, type) => {
+  let indexes
+  const arrIndex = []
+  if (type === 'reciever') {
+    array.map((user, index) => !user.isSender && arrIndex.push(index))
+    indexes = arrIndex[arrIndex.length - 1]
+  } else {
+    array.map((user, index) => user.isSender && arrIndex.push(index))
+    indexes = arrIndex[arrIndex.length - 1]
+  }
+
+  return indexes
+}

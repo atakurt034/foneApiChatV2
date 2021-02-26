@@ -36,13 +36,9 @@ const App = () => {
       <main>
         <Container>
           <Route
-            path='/user/:id'
+            path='/user/:name'
             render={(e) => (
-              <UserChat
-                {...e}
-                socket={socket}
-                sendChatroomId={(e) => setChatroomId(e)}
-              />
+              <UserChat {...e} socket={socket} sendChatroomId={setChatroomId} />
             )}
             exact
           />

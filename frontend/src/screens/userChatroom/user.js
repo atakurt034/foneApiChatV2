@@ -15,8 +15,8 @@ import {
 } from '@material-ui/core'
 import React, { useState, useEffect } from 'react'
 
-import { CA } from '../../actions/index'
-import { CHAT } from '../../constants'
+import { UA } from '../../actions/index'
+import { CHAT } from '../../constants/index'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -24,7 +24,6 @@ import SendIcon from '@material-ui/icons/Send'
 import { ModalLoader } from '../../components/ModalLoader'
 import { ModalMessage } from '../../components/ModalMessage'
 
-import { SnackbarProvider, useSnackbar } from 'notistack'
 import { TextDivider } from '../../components/divider'
 import axios from 'axios'
 
@@ -34,20 +33,22 @@ import { useStyles } from './styles'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 import ListIcon from '@material-ui/icons/List'
 import { UserDrawer } from '../../components/drawer'
+import { filter_room } from '../../lib/filters'
+import { ChipUser } from '../../components/user/userChip'
 
-const Chat = ({ history, match, socket, sendChatroomId }) => {
+export const UserChat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const theme = useTheme()
   const sm = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const { enqueueSnackbar } = useSnackbar()
-
   const [userList, setUserList] = useState([])
   const [oldMsg, setOldMsg] = useState([])
+  const [chatroomId, setChatroomId] = useState('')
 
   const [response, setResponse] = useState([])
   const [chatname, setChatname] = useState('Chatroom')
+  const [rooms, setRooms] = useState({ messages: [] })
 
   const myRef = React.useRef()
   const textRef = React.useRef()
@@ -55,13 +56,12 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
 
-  const getRoomDetails = useSelector((state) => state.getRoomDetails)
-  const { room, loading: loadingRoom } = getRoomDetails
+  const { rooms: private_room, loading, error } = useSelector(
+    (state) => state.privateRooms
+  )
 
-  const getMessages = useSelector((state) => state.getMessages)
-  const { messages, loading, error } = getMessages
-
-  const chatroomId = match.params.id
+  const name = match.params.name
+  const id = history.location.search.split('=')[1]
 
   const scrollToBottom = () => {
     if (myRef.current) {
@@ -73,13 +73,17 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
       return
     }
   }
+  useEffect(() => {
+    if (private_room) {
+      setRooms(private_room)
+      sendChatroomId(chatroomId)
+      setChatroomId(private_room._id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [private_room, rooms])
 
   useEffect(() => {
-    if (userInfo) {
-      dispatch(CA.getMessages(chatroomId))
-      dispatch(CA.getRoomDetails(chatroomId))
-      sendChatroomId(chatroomId)
-    }
+    dispatch(UA.getPrivateRooms(id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -87,23 +91,23 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
     if (!userInfo) {
       history.push('/login')
     }
-    if (messages && room) {
-      setChatname(room.name)
-      messages.reverse().map((i) =>
+    if (rooms) {
+      setChatname(name)
+      rooms.messages.map((i) =>
         setResponse((prev) => [
           ...prev,
           {
             message: i.message,
             name: i.user.name,
+            image: i.user.image,
             isSender: i.user._id === userInfo._id,
           },
         ])
       )
     }
-  }, [messages, userInfo, history, dispatch, chatroomId, room])
+  }, [userInfo, history, rooms, name])
 
   //**************************** socket *********************************//
-
   useEffect(() => {
     let time = 1000
     setTimeout(() => {
@@ -113,9 +117,10 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
         scrollToBottom()
       }
     }, time)
+
     if (socket) {
-      socket.emit('joinRoom', { chatroomId })
-      socket.on('output', (data) => {
+      socket.emit('privateJoin', { chatroomId })
+      socket.on('privateOutput', (data) => {
         setResponse((prev) => [
           ...prev,
           { ...data, isSender: data.id === userInfo._id },
@@ -127,66 +132,42 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
     return () => {
       //Component Unmount
       if (socket) {
-        socket.emit('leaveRoom', {
+        socket.emit('privateLeave', {
           chatroomId,
         })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [chatroomId, socket, userInfo])
 
   useEffect(() => {
     if (socket) {
-      socket.on('joinRoom', ({ name, users }) => {
-        const use = Object.keys(users).map(
-          (key) =>
-            key.split(',')[0] === chatroomId && {
-              name: key.split(',')[1],
-              id: key.split(',')[2],
-            }
-        )
+      socket.on('privateJoin', ({ name, users }) => {
+        const use = filter_room(users, chatroomId)
 
         setUserList(use)
-        enqueueSnackbar(`${name} entered`, {
-          anchorOrigin: {
-            vertical: 'top',
-            horizontal: 'right',
-          },
-          variant: 'success',
-          autoHideDuration: 1000,
-        })
       })
 
-      socket.on('leaveRoom', ({ name, users }) => {
-        const use = Object.keys(users).map(
-          (key) =>
-            key.split(',')[0] === chatroomId && {
-              name: key.split(',')[1],
-              id: key.split(',')[2],
-            }
-        )
-
-        setUserList(use)
-        enqueueSnackbar(`${name} left`, {
-          anchorOrigin: {
-            vertical: 'top',
-            horizontal: 'right',
-          },
-          variant: 'error',
-          autoHideDuration: 1000,
-        })
+      socket.on('privateLeave', ({ name, users }) => {
+        const use = filter_room(users, chatroomId)
         dispatch({ type: CHAT.CREATE_ROOM_RESET })
         dispatch({ type: CHAT.GET_MESSAGES_RESET })
         dispatch({ type: CHAT.GET_ROOMS_RESET })
         dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
+        dispatch({ type: CHAT.PRIVATE_MESSAGE_RESET })
+
+        setUserList(use)
       })
     }
-  }, [chatroomId, socket, dispatch, enqueueSnackbar])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket])
 
   const clickHandler = () => {
     if (socket) {
-      socket.emit('input', {
+      socket.emit('privateInput', {
         message: textRef.current.value,
+        name: userInfo.name,
+        image: userInfo.image,
         chatroomId,
         id: userInfo._id,
       })
@@ -217,7 +198,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
       },
     }
     const { data } = await axios.get(
-      `/api/chatrooms/messages/${chatroomId}?skip=${skip}&limit=${limit}`,
+      `/api/chatrooms/messages/${rooms._id}?skip=${skip}&limit=${limit}`,
       config
     )
 
@@ -235,7 +216,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
     }
   }
 
-  return loading || loadingRoom ? (
+  return loading ? (
     <ModalLoader />
   ) : error ? (
     <ModalMessage variant='error'>{error}</ModalMessage>
@@ -286,7 +267,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
               }}
             >
               <Box style={{ padding: 15 }}>
-                {room && room.messages.length > 9 && showOld && (
+                {rooms.messages.length > 9 && showOld && (
                   <TextDivider>
                     <IconButton
                       onClick={loadOldHandler}
@@ -358,9 +339,13 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                     }
                     style={{ padding: '5px 0', margin: '10px 0', width: '80%' }}
                   >
-                    <Typography variant='body1' className={classes.text}>
-                      {text.name.split(' ')[0]}
-                    </Typography>
+                    <ChipUser
+                      text={text}
+                      history={history}
+                      socket={socket}
+                      chatroomId={chatroomId}
+                    />
+
                     <Typography variant='body2' className={classes.text}>
                       {text.message}
                     </Typography>
@@ -392,18 +377,5 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
         </Card>
       </Grid>
     </Grid>
-  )
-}
-
-export const UserChat = ({ history, match, socket, sendChatroomId }) => {
-  return (
-    <SnackbarProvider maxSnack={6}>
-      <Chat
-        history={history}
-        match={match}
-        socket={socket}
-        sendChatroomId={sendChatroomId}
-      />
-    </SnackbarProvider>
   )
 }

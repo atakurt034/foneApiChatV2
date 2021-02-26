@@ -11,5 +11,9 @@ router
   .delete(protect, admin, chat.deleteChatroom)
   .put(protect, admin, chat.editChatroomName)
 router.route('/messages/:id').get(protect, chat.getMessages)
+router
+  .route('/private/:id')
+  .post(protect, chat.createPrivateMsg)
+  .get(protect, chat.privateRooms)
 
 export default router

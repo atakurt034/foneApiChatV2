@@ -6,7 +6,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 import PersonIcon from '@material-ui/icons/Person'
 import MessageIcon from '@material-ui/icons/Message'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { useStyles, StyledMenu, StyledMenuItem } from './style'
 import {
@@ -18,11 +18,15 @@ import {
   Grid,
   Modal,
 } from '@material-ui/core'
+import { CA } from '../../actions/index'
+import { USER } from '../../constants/index'
 
-export const UserMenu = ({ user, history, socket, chatroomId, closed }) => {
+export const UserMenu = ({ user, history, socket, chatroomId }) => {
+  const dispatch = useDispatch()
   const classes = useStyles()
 
   const { userInfo } = useSelector((state) => state.userLogin)
+  const { room } = useSelector((state) => state.privateMsg)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [active, setActive] = React.useState(false)
@@ -43,6 +47,18 @@ export const UserMenu = ({ user, history, socket, chatroomId, closed }) => {
       socket.emit('kick', { user: user.id, chatroomId })
     }
   }
+
+  const handleMessage = () => {
+    dispatch(CA.privateMsg(user.id))
+  }
+
+  React.useEffect(() => {
+    if (room) {
+      history.push(`/user/${user.name}?id=${room._id}`)
+      dispatch({ type: USER.PRIVATE_ROOMS_RESET })
+    }
+  }, [room, history, user, dispatch])
+
   React.useEffect(() => {
     if (socket) {
       socket.on('kicked', (data) => {
@@ -57,7 +73,7 @@ export const UserMenu = ({ user, history, socket, chatroomId, closed }) => {
   const menuHandler = (type) => {
     switch (type) {
       case 'message':
-        history.push(`/user/${user.id}`)
+        handleMessage()
         handleClose()
         break
       case 'info':

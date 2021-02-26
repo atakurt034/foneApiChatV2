@@ -37,9 +37,9 @@ import { UserDrawer } from '../../components/drawer'
 import { UserMenu } from '../../components/user/userMenu'
 import { ChipUser, ChipUserOld } from '../../components/user/userChip'
 
-import { filter_room } from '../../lib/filters'
+import { filter_room, arrayFilter } from '../../lib/filters'
 
-const Chat = ({ history, match, socket, sendChatroomId }) => {
+const Chat = ({ history, match, socket, sendChatroomId, setPrvtRoomId }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const theme = useTheme()
@@ -231,20 +231,6 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
     if (data.length === oldMsg.length) {
       setShowOld(false)
     }
-  }
-
-  const arrayFilter = (array, type) => {
-    let index
-    const arrIndex = []
-    if (type === 'reciever') {
-      array.map((user, index) => !user.isSender && arrIndex.push(index))
-      index = arrIndex[arrIndex.length - 1]
-    } else {
-      array.map((user, index) => user.isSender && arrIndex.push(index))
-      index = arrIndex[arrIndex.length - 1]
-    }
-
-    return index
   }
 
   return loading || loadingRoom ? (

@@ -14,10 +14,6 @@ const chatroomSchema = new mongoose.Schema(
       },
     ],
     messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
-    onlineUsers: {
-      type: Number,
-      default: 0,
-    },
   },
   { timestamps: true }
 )

@@ -111,3 +111,34 @@ export const userUpdateProfile = (user) => async (dispatch, getState) => {
     })
   }
 }
+
+export const getPrivateRooms = (id) => async (dispatch, getState) => {
+  const {
+    userLogin: { userInfo },
+  } = getState()
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${userInfo.token}`,
+    },
+  }
+
+  try {
+    dispatch({ type: USER.PRIVATE_ROOMS_REQUEST })
+    const { data } = await axios.get(
+      `/api/chatrooms/private/${userInfo._id}`,
+      config
+    )
+    const room = data.privateRooms.find((x) => x._id === id)
+    dispatch({ type: USER.PRIVATE_ROOMS_SUCCESS, payload: room })
+  } catch (error) {
+    dispatch({
+      type: USER.PRIVATE_ROOMS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}

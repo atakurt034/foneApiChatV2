@@ -1,6 +1,8 @@
 import asyncHandler from 'express-async-handler'
+import PrivateRoom from '../models/privaterooms.js'
 import Chatroom from '../models/chatrooms.js'
 import Message from '../models/messages.js'
+import User from '../models/user.js'
 
 export const getRooms = asyncHandler(async (req, res) => {
   const rooms = await Chatroom.find({})
@@ -24,7 +26,7 @@ export const createRoom = asyncHandler(async (req, res) => {
     res.status(401)
     throw new Error('Room already exist')
   } else {
-    const newRoom = await await Chatroom.create({ name, users })
+    const newRoom = await Chatroom.create({ name, users })
     if (newRoom) {
       res.json(newRoom)
       res.status
@@ -103,5 +105,52 @@ export const editChatroomName = asyncHandler(async (req, res) => {
       res.status(204)
       throw new Error('Edit failed')
     }
+  }
+})
+
+export const createPrivateMsg = asyncHandler(async (req, res) => {
+  const id1 = req.body.id
+  const id2 = req.user._id
+  const users = await User.find({ _id: { $in: [id1, id2] } })
+  const room = await PrivateRoom.findOne({ users: { $in: [id1, id2] } })
+
+  const [user1, user2] = users
+
+  if (!room) {
+    const create_room = await PrivateRoom.create({ users })
+    if (create_room) {
+      user1.privateRooms.push(create_room._id)
+      user2.privateRooms.push(create_room._id)
+      await user1.save()
+      await user2.save()
+      res.json(create_room)
+    } else {
+      res.status(404)
+      throw new Error('failed')
+    }
+  } else {
+    res.json(room)
+  }
+})
+
+export const privateRooms = asyncHandler(async (req, res) => {
+  try {
+    const id = req.user._id
+    const user = await User.findById(id)
+      .select('privateRooms')
+      .populate({
+        path: 'privateRooms',
+        model: 'PrivateRoom',
+        populate: {
+          path: 'messages',
+          model: 'Message',
+          populate: { path: 'user', select: 'name image' },
+        },
+      })
+    res.status(200)
+    res.json(user)
+  } catch (error) {
+    res.status(404)
+    throw new Error(error)
   }
 })

@@ -57,3 +57,18 @@ export const userUpdateReducer = (state = {}, action) => {
       return state
   }
 }
+
+export const getPrivateRoomsReducer = (state = {}, action) => {
+  switch (action.type) {
+    case USER.PRIVATE_ROOMS_REQUEST:
+      return { loading: true }
+    case USER.PRIVATE_ROOMS_SUCCESS:
+      return { loading: false, rooms: action.payload }
+    case USER.PRIVATE_ROOMS_FAIL:
+      return { loading: false, error: action.payload }
+    case USER.PRIVATE_ROOMS_RESET:
+      return {}
+    default:
+      return state
+  }
+}

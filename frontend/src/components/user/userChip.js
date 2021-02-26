@@ -38,7 +38,6 @@ export const ChipUser = ({ text, history, socket, chatroomId, closed }) => {
     if (socket) {
       socket.emit('kick', { user: text.id, chatroomId })
     }
-    console.log(text)
   }
 
   const menuHandler = (type) => {

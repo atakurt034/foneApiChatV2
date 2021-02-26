@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema(
         ref: 'Chatroom',
       },
     ],
+    privateRooms: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'PrivateRoom' },
+    ],
   },
   {
     timestamps: true,

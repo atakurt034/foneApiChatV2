@@ -13,6 +13,9 @@ import morgan from 'morgan'
 import User from './models/user.js'
 import Chatroom from './models/chatrooms.js'
 import Message from './models/messages.js'
+import PrivateRoom from './models/privaterooms.js'
+
+import { PR, Private } from './socket_routes/index_socket.js'
 
 dotenv.config()
 const app = express()
@@ -72,67 +75,19 @@ const users = {}
 // returns the union of two arrays where duplicate objects with the same 'prop' are removed
 
 io.on('connect', (socket) => {
-  socket.on('joinRoom', async ({ chatroomId }) => {
-    const user = await User.findOne({ _id: socket.userId })
-    const chatroom = await Chatroom.findById(chatroomId)
-
-    const userExist = chatroom.users.find(
-      (x) => x.toString() === user._id.toString()
-    )
-
-    if (!userExist) {
-      chatroom.users.push(user)
-    }
-
-    users[socket.userId] = { ...user._doc, chatroomId }
-
-    socket.join(chatroomId)
-
-    io.to(chatroomId).emit('joinRoom', {
-      name: user.name,
-      users,
-    })
-    io.emit('publicJoin', users)
-    await chatroom.save()
-  })
-
-  socket.on('leaveRoom', async ({ chatroomId }) => {
-    const user = await User.findOne({ _id: socket.userId })
-
-    delete users[socket.userId]
-
-    io.to(chatroomId).emit('leaveRoom', {
-      name: user.name,
-      users,
-    })
-    io.emit('publicLeave', users)
-    socket.leave(chatroomId)
-  })
-
-  socket.on('input', async ({ message, name, image, chatroomId }) => {
-    if (message.trim().length > 0) {
-      const id = socket.userId
-      const user = await User.findById(id)
-      const chatroom = await Chatroom.findById(chatroomId)
-      const newMessage = await Message.create({
-        message,
-        user,
-        chatroomId,
-      })
-
-      chatroom.messages.push(newMessage)
-
-      io.to(chatroomId).emit('output', {
-        message,
-        name,
-        image: user.image,
-        chatroomId,
-        id: socket.userId,
-      })
-      await chatroom.save()
-    }
-  })
+  socket.on('joinRoom', PR.joinRoom(User, Chatroom, users, socket, io))
+  socket.on('leaveRoom', PR.leaveRoom(User, users, io, socket))
+  socket.on('input', PR.input(User, Chatroom, Message, io, socket))
   socket.on('kick', ({ user, chatroomId }) => {
     io.to(chatroomId).emit('kicked', { user, chatroomId })
   })
+  socket.on(
+    'privateJoin',
+    Private.privateJoin(User, PrivateRoom, users, socket, io)
+  )
+  socket.on('privateLeave', Private.privateLeave(User, users, io, socket))
+  socket.on(
+    'privateInput',
+    Private.privateInput(User, PrivateRoom, Message, io, socket)
+  )
 })
