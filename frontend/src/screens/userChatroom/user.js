@@ -28,21 +28,19 @@ import { TextDivider } from '../../components/divider'
 import axios from 'axios'
 
 import { Skeleton } from '@material-ui/lab'
+import { SnackbarProvider, useSnackbar } from 'notistack'
 
 import { useStyles } from './styles'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
-import ListIcon from '@material-ui/icons/List'
-import { UserDrawer } from '../../components/drawer'
-import { filter_room } from '../../lib/filters'
 import { ChipUser } from '../../components/user/userChip'
 
-export const UserChat = ({ history, match, socket, sendChatroomId }) => {
+const Chat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
+  const { enqueueSnackbar } = useSnackbar()
   const dispatch = useDispatch()
   const theme = useTheme()
   const sm = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const [userList, setUserList] = useState([])
   const [oldMsg, setOldMsg] = useState([])
   const [chatroomId, setChatroomId] = useState('')
 
@@ -142,20 +140,33 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
 
   useEffect(() => {
     if (socket) {
-      socket.on('privateJoin', ({ name, users }) => {
-        const use = filter_room(users, chatroomId)
-
-        setUserList(use)
+      socket.on('privateJoin', ({ name }) => {
+        enqueueSnackbar(`${name} entered`, {
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+          variant: 'success',
+          autoHideDuration: 500,
+        })
+        console.log(name)
       })
 
-      socket.on('privateLeave', ({ name, users }) => {
-        const use = filter_room(users, chatroomId)
+      socket.on('privateLeave', ({ name }) => {
+        enqueueSnackbar(`${name} left`, {
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+          variant: 'error',
+          autoHideDuration: 500,
+        })
+        console.log(name)
+
         dispatch({ type: CHAT.CREATE_ROOM_RESET })
         dispatch({ type: CHAT.GET_MESSAGES_RESET })
         dispatch({ type: CHAT.GET_ROOMS_RESET })
         dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
-
-        setUserList(use)
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,7 +195,6 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [limit, setLimit] = useState(10)
   const [showOld, setShowOld] = useState(true)
-  const [open, setOpen] = useState(false)
 
   const loadOldHandler = async () => {
     setIsLoading(true)
@@ -233,17 +243,9 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
             <Grid item xs={4} style={{ textAlign: 'center' }}>
               {sm ? (
                 <>
-                  <IconButton onClick={() => setOpen(true)}>
-                    <ListIcon />
-                  </IconButton>
                   <IconButton onClick={() => history.push('/')} title='exit'>
                     <ExitToAppIcon />
                   </IconButton>
-                  <UserDrawer
-                    userList={userList}
-                    close={() => setOpen(false)}
-                    open={open}
-                  />
                 </>
               ) : (
                 <Button
@@ -376,5 +378,18 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
         </Card>
       </Grid>
     </Grid>
+  )
+}
+
+export const UserChat = ({ history, match, socket, sendChatroomId }) => {
+  return (
+    <SnackbarProvider maxSnack={6}>
+      <Chat
+        history={history}
+        match={match}
+        socket={socket}
+        sendChatroomId={sendChatroomId}
+      />
+    </SnackbarProvider>
   )
 }

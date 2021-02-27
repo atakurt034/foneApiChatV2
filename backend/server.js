@@ -81,11 +81,8 @@ io.on('connect', (socket) => {
   socket.on('kick', ({ user, chatroomId }) => {
     io.to(chatroomId).emit('kicked', { user, chatroomId })
   })
-  socket.on(
-    'privateJoin',
-    Private.privateJoin(User, PrivateRoom, users, socket, io)
-  )
-  socket.on('privateLeave', Private.privateLeave(User, users, io, socket))
+  socket.on('privateJoin', Private.privateJoin(User, Message, socket, io))
+  socket.on('privateLeave', Private.privateLeave(User, io, socket))
   socket.on(
     'privateInput',
     Private.privateInput(User, PrivateRoom, Message, io, socket)

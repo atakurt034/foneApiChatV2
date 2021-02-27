@@ -88,8 +88,6 @@ export const editChatroomName = asyncHandler(async (req, res) => {
   const room = await Chatroom.findById(id)
   const existName = await Chatroom.findOne({ name: req.body.text })
 
-  console.log(existName)
-
   if (existName) {
     res.status(404)
     throw new Error('Name already exist')
@@ -113,7 +111,9 @@ export const createPrivateMsg = asyncHandler(async (req, res) => {
   const id2 = req.user._id
   const users = await User.find({ _id: { $in: [id1, id2] } })
   const room = await PrivateRoom.findOne({
-    $and: [{ users: id1 }, { users: id2 }],
+    $or: [{ users: { $eq: [id1, id2] } }, { users: { $eq: [id2, id1] } }],
+  }).catch((err) => {
+    throw new Error(err)
   })
 
   const [user1, user2] = users

@@ -9,6 +9,7 @@ const messageSchema = new mongoose.Schema(
       ref: 'Chatroom',
       required: true,
     },
+    seenBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 )

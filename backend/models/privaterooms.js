@@ -9,9 +9,9 @@ const privateRoomSchema = new mongoose.Schema(
         required: [true, 'Two users required'],
         validate: {
           validator: (users) => {
-            return !(users.length > 2)
+            return users.length > 2
           },
-          message: (props) => `${props.value} Error only 2 users`,
+          message: (props) => `Error need 2 users`,
         },
       },
     ],
