@@ -35,14 +35,17 @@ export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
   if (message.trim().length > 0) {
     const id = socket.userId
     const user = await User.findById(id)
-    const chatroom = await PrivateRoom.findById(chatroomId)
+    let private_room
+
+    if (chatroomId) {
+      private_room = await PrivateRoom.findById(chatroomId)
+    }
     const newMessage = await Message.create({
       message,
       user,
       chatroomId,
+      seenBy: user,
     })
-
-    chatroom.messages.push(newMessage)
 
     io.to(chatroomId).emit('privateOutput', {
       message,
@@ -51,6 +54,7 @@ export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
       chatroomId,
       id: socket.userId,
     })
-    await chatroom.save()
+    await private_room.messages.push(newMessage)
+    await private_room.save()
   }
 }

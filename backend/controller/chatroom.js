@@ -112,15 +112,14 @@ export const createPrivateMsg = asyncHandler(async (req, res) => {
   const users = await User.find({ _id: { $in: [id1, id2] } })
   const room = await PrivateRoom.findOne({
     $or: [{ users: { $eq: [id1, id2] } }, { users: { $eq: [id2, id1] } }],
-  }).catch((err) => {
-    throw new Error(err)
   })
 
   const [user1, user2] = users
 
-  if (!room) {
-    const create_room = await PrivateRoom.create({ users })
-    if (create_room) {
+  if (!room && users.length === 2) {
+    const create_room = new PrivateRoom({ users })
+    const new_private_room = await create_room.save()
+    if (new_private_room) {
       user1.privateRooms.push(create_room._id)
       user2.privateRooms.push(create_room._id)
       await user1.save()

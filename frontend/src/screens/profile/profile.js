@@ -67,7 +67,6 @@ export const Profile = () => {
         form,
         config
       )
-      console.log(data)
       const path = data.file.path.split('public')[1]
       setUser({ ...user, image: path })
     } catch (error) {

@@ -149,7 +149,6 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
           variant: 'success',
           autoHideDuration: 500,
         })
-        console.log(name)
       })
 
       socket.on('privateLeave', ({ name }) => {
@@ -161,7 +160,6 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
           variant: 'error',
           autoHideDuration: 500,
         })
-        console.log(name)
 
         dispatch({ type: CHAT.CREATE_ROOM_RESET })
         dispatch({ type: CHAT.GET_MESSAGES_RESET })

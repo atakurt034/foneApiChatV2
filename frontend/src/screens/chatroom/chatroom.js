@@ -248,11 +248,11 @@ const Chat = ({ history, match, socket, sendChatroomId, setPrvtRoomId }) => {
             <Typography variant='h6'>Online Users</Typography>
             {userList.map((user, index) => (
               <UserMenu
-                key={index}
-                history={history}
                 user={user}
+                history={history}
                 chatroomId={chatroomId}
                 socket={socket}
+                key={index}
               />
             ))}
           </Paper>

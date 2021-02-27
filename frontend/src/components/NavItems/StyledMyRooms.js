@@ -5,6 +5,8 @@ import IconButton from '@material-ui/core/IconButton'
 
 import ChatIcon from '@material-ui/icons/Chat'
 
+import { useDispatch, useSelector } from 'react-redux'
+
 const StyledBadge = withStyles((theme) => ({
   badge: {
     right: 3,
@@ -14,6 +16,7 @@ const StyledBadge = withStyles((theme) => ({
 }))(Badge)
 
 export const MyRooms = () => {
+  const dispatch = useDispatch()
   const orderCount = [1]
 
   const count = orderCount.length
