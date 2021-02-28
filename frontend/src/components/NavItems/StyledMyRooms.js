@@ -20,8 +20,6 @@ const StyledBadge = withStyles((theme) => ({
 export const MyRooms = ({ socket }) => {
   const dispatch = useDispatch()
 
-  const count = 1
-
   const { userInfo } = useSelector((state) => state.userLogin)
   const { messages, loading, error } = useSelector((state) => state.privateMsg)
 
@@ -30,25 +28,37 @@ export const MyRooms = ({ socket }) => {
     }
   }, [messages])
 
+  const count = 1
+
   React.useEffect(() => {
     if (socket) {
+      const getmessage = async () => {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        }
+        const { data } = await axios.get(
+          '/api/chatrooms/private/message',
+          config
+        )
+
+        const seenBy = data.map((data) =>
+          data.privateRooms.map((privateRooms, index1) =>
+            privateRooms.messages.map((messages, index2) =>
+              messages.seenBy.map((seenBy, index3) => index3)
+            )
+          )
+        )
+        console.log(data)
+      }
       socket.on('privateOutput', () => {
         dispatch(UA.getPrivateMsgs())
-        const getmessage = async () => {
-          const config = {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${userInfo.token}`,
-            },
-          }
-          const { data } = await axios.get(
-            '/api/chatrooms/private/message',
-            config
-          )
-          console.log(data, userInfo._id)
-        }
+
         getmessage()
       })
+      getmessage()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket])
@@ -57,7 +67,6 @@ export const MyRooms = ({ socket }) => {
     dispatch(UA.getPrivateMsgs())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
   return (
     <IconButton
       style={{
