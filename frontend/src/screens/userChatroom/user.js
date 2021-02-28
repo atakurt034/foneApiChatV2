@@ -177,7 +177,6 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
         name: userInfo.name,
         image: userInfo.image,
         chatroomId,
-        id: userInfo._id,
       })
       textRef.current.value = ''
     }

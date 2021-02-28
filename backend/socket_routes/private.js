@@ -8,7 +8,6 @@ export const privateJoin = (User, Message, socket, io) => async ({
 
   users[socket.userId] = user._id
   const userList = Object.values(users)
-  console.log(userList)
 
   if (chatroomId) {
     await Message.updateMany(
@@ -41,15 +40,17 @@ export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
   chatroomId,
 }) => {
   if (message.trim().length > 0) {
-    const userList = Object.values(users)
     const id = socket.userId
     const user = await User.findById(id)
     let private_room
+    let userList = Object.values(users)
 
     if (chatroomId) {
       private_room = await PrivateRoom.findById(chatroomId)
     }
-    console.log(userList)
+    if (userList.length <= 0) {
+      userList = user
+    }
     const newMessage = new Message({
       message,
       user,
