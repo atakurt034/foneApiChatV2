@@ -142,16 +142,34 @@ export const privateRooms = asyncHandler(async (req, res) => {
       .populate({
         path: 'privateRooms',
         model: 'PrivateRoom',
-        populate: {
-          path: 'messages',
-          model: 'Message',
-          populate: { path: 'user', select: 'name image' },
-        },
+        populate: [
+          {
+            path: 'messages',
+            model: 'Message',
+            populate: { path: 'user', select: 'name image' },
+          },
+          { path: 'users', select: 'name' },
+        ],
       })
     res.status(200)
     res.json(user)
   } catch (error) {
     res.status(404)
+    throw new Error(error)
+  }
+})
+
+export const getPrivateMsgs = asyncHandler(async (req, res) => {
+  try {
+    const id = req.user._id
+    const user = await User.find({
+      _id: id,
+      'privateRooms.messages.seenBy': { $ne: { $in: [id] } },
+    })
+    res.status(204)
+    res.json(user)
+  } catch (error) {
+    res.status(500)
     throw new Error(error)
   }
 })

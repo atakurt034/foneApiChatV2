@@ -7,6 +7,7 @@ import { RegisterScreen } from './screens/RegisterScreen/RegisterScreen'
 import { Dashboard } from './screens/dashboard/dashboard'
 import { UserChat } from './screens/userChatroom/user'
 import { Profile } from './screens/profile/profile'
+import { PrivateRoom } from './screens/privateRoom/privateRoom'
 
 import { io } from 'socket.io-client'
 
@@ -42,6 +43,7 @@ const App = () => {
             )}
             exact
           />
+
           <Route
             path='/chatroom/:id'
             render={(e) => (
@@ -53,9 +55,17 @@ const App = () => {
             )}
             exact
           />
+
+          <Route
+            path='/private/:id'
+            render={(e) => <PrivateRoom {...e} socket={socket} />}
+            exact
+          />
+
           <Route path='/profile' component={Profile} exact />
           <Route path='/login' component={LoginScreen} />
           <Route path='/register' component={RegisterScreen} />
+
           <Route
             path='/'
             render={(e) => <Dashboard {...e} socket={socket} />}

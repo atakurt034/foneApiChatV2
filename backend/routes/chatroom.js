@@ -15,5 +15,6 @@ router
   .route('/private/:id')
   .post(protect, chat.createPrivateMsg)
   .get(protect, chat.privateRooms)
+router.route('/private/message').get(protect, chat.getPrivateMsgs)
 
 export default router

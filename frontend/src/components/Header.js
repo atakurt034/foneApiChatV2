@@ -85,7 +85,7 @@ const Header = ({ history, socket }) => {
     <AppBar position='static'>
       <Toolbar>
         <Grid className={classes.brand}>Chat App</Grid>
-        {<Account />}
+        {<Account socket={socket} />}
       </Toolbar>
     </AppBar>
   )

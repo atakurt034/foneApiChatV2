@@ -9,7 +9,6 @@ router
   .route('/profile')
   .get(protect, user.getUserProfile)
   .put(protect, user.updateUserProfile)
-router.route('/:id')
 router.post('/uploads/avatar', protect, user.updateAvatar)
 
 export default router

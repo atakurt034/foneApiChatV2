@@ -25,7 +25,7 @@ import { UA } from '../../../actions/index'
 import { MyRooms } from '../StyledMyRooms'
 import { ModalLoader } from '../../ModalLoader'
 
-const Account = ({ history }) => {
+const Account = ({ history, socket }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const dispatch = useDispatch()
   const theme = useTheme()
@@ -137,11 +137,14 @@ const Account = ({ history }) => {
         </StyledMenuItem>
 
         <StyledMenuItem onClick={handleClose}>
-          <Link className={classes.link} to='/rooms/id'>
+          <Link
+            className={classes.link}
+            to={`/private/${userInfo && userInfo._id}`}
+          >
             <ListItemIcon>
-              <MyRooms />
+              <MyRooms socket={socket} />
             </ListItemIcon>
-            <ListItemText primary='My Rooms' />
+            <ListItemText primary='Private Rooms' />
           </Link>
         </StyledMenuItem>
         <StyledMenuItem onClick={handleClose}>

@@ -72,3 +72,18 @@ export const getPrivateRoomsReducer = (state = {}, action) => {
       return state
   }
 }
+
+export const getPrivateMsgReducer = (state = {}, action) => {
+  switch (action.type) {
+    case USER.PRIVATE_MESSAGE_REQUEST:
+      return { loading: true }
+    case USER.PRIVATE_MESSAGE_SUCCESS:
+      return { loading: false, messages: action.payload }
+    case USER.PRIVATE_MESSAGE_FAIL:
+      return { loading: false, error: action.payload }
+    case USER.PRIVATE_MESSAGE_RESET:
+      return {}
+    default:
+      return state
+  }
+}

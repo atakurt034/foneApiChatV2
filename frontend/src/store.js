@@ -10,6 +10,7 @@ const reducer = combineReducers({
   userDetails: USER.userDetailsReducer,
   userUpdate: USER.userUpdateReducer,
   privateRooms: USER.getPrivateRoomsReducer,
+  privateMsg: USER.getPrivateMsgReducer,
   getRooms: CHAT.getRoomsReducer,
   createRoom: CHAT.createRoomsReducer,
   getRoomDetails: CHAT.getRoomDetailsReducer,

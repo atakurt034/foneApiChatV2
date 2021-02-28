@@ -142,3 +142,33 @@ export const getPrivateRooms = (id) => async (dispatch, getState) => {
     })
   }
 }
+
+export const getPrivateMsgs = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: USER.PRIVATE_MESSAGE_REQUEST })
+    const {
+      userLogin: { userInfo },
+    } = getState()
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    }
+
+    const { data } = await axios.get(
+      `/api/chatrooms/private/${userInfo._id}`,
+      config
+    )
+    dispatch({ type: USER.PRIVATE_MESSAGE_SUCCESS, payload: data.privateRooms })
+  } catch (error) {
+    dispatch({
+      type: USER.PRIVATE_MESSAGE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}

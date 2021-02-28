@@ -1,13 +1,19 @@
+// private users
+const users = {}
+
 export const privateJoin = (User, Message, socket, io) => async ({
   chatroomId,
 }) => {
   const user = await User.findOne({ _id: socket.userId })
 
-  let user_messages
+  users[socket.userId] = user._id
+  const userList = Object.values(users)
+  console.log(userList)
+
   if (chatroomId) {
-    user_messages = await Message.updateMany(
+    await Message.updateMany(
       { chatroomId, seenBy: { $ne: user } },
-      { $push: { seenBy: user } },
+      { $push: { seenBy: userList } },
       { new: true }
     )
   }
@@ -19,6 +25,8 @@ export const privateJoin = (User, Message, socket, io) => async ({
 
 export const privateLeave = (User, io, socket) => async ({ chatroomId }) => {
   const user = await User.findOne({ _id: socket.userId })
+
+  delete users[socket.userId]
 
   io.to(chatroomId).emit('privateLeave', {
     name: user.name,
@@ -33,6 +41,7 @@ export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
   chatroomId,
 }) => {
   if (message.trim().length > 0) {
+    const userList = Object.values(users)
     const id = socket.userId
     const user = await User.findById(id)
     let private_room
@@ -40,12 +49,14 @@ export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
     if (chatroomId) {
       private_room = await PrivateRoom.findById(chatroomId)
     }
-    const newMessage = await Message.create({
+    console.log(userList)
+    const newMessage = new Message({
       message,
       user,
       chatroomId,
-      seenBy: user,
+      seenBy: userList,
     })
+    const message_created = await newMessage.save()
 
     io.to(chatroomId).emit('privateOutput', {
       message,
@@ -54,7 +65,7 @@ export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
       chatroomId,
       id: socket.userId,
     })
-    await private_room.messages.push(newMessage)
+    await private_room.messages.push(message_created)
     await private_room.save()
   }
 }
