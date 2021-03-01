@@ -10,7 +10,7 @@ import {
   useTheme,
 } from '@material-ui/core'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import ChatIcon from '@material-ui/icons/Chat'
 import { ModalLoader } from '../../components/ModalLoader'
@@ -19,10 +19,8 @@ import { useStyles } from './styles'
 
 import { SnackbarProvider, useSnackbar } from 'notistack'
 import axios from 'axios'
-import { UA } from '../../actions/index'
 
-const Handler = ({ history, socket }) => {
-  const dispatch = useDispatch()
+const Handler = ({ history, counter }) => {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const theme = useTheme()
@@ -30,7 +28,6 @@ const Handler = ({ history, socket }) => {
 
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo, loading, error } = userLogin
-  const { counter } = useSelector((state) => state.privateCount)
 
   const [chatrooms, setChatrooms] = React.useState([])
   const [rooms, setRooms] = React.useState([])
@@ -83,25 +80,10 @@ const Handler = ({ history, socket }) => {
   }, [rooms, userInfo, history])
 
   React.useEffect(() => {
-    dispatch(UA.getPrvtMsgCount())
     if (counter) {
       setCount(counter)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  React.useEffect(() => {
-    if (socket) {
-      socket.on('refreshCount', () => {
-        dispatch(UA.getPrvtMsgCount())
-        if (counter) {
-          setCount(counter)
-        }
-      })
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket, counter])
+  }, [counter])
 
   const clickHandler = (user) => {
     const name = user.name.find((x) => typeof x === 'string')
@@ -233,10 +215,10 @@ const Handler = ({ history, socket }) => {
   )
 }
 
-export const PrivateRoom = ({ socket, history }) => {
+export const PrivateRoom = ({ socket, history, counter }) => {
   return (
     <SnackbarProvider maxSnack={6}>
-      <Handler socket={socket} history={history} />
+      <Handler socket={socket} history={history} counter={counter} />
     </SnackbarProvider>
   )
 }

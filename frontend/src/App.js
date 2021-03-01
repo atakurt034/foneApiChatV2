@@ -18,8 +18,8 @@ import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
   const dispatch = useDispatch()
-  const userLogin = useSelector((state) => state.userLogin)
-  const { userInfo } = userLogin
+  const { userInfo } = useSelector((state) => state.userLogin)
+  const { counter } = useSelector((state) => state.privateCount)
 
   const [chatroomId, setChatroomId] = React.useState('')
 
@@ -33,18 +33,22 @@ const App = () => {
   })
 
   socket.connect()
+  React.useEffect(() => {
+    if (userInfo) {
+      dispatch(UA.getPrvtMsgCount())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo])
 
   React.useEffect(() => {
-    if (socket) {
-      socket.on('refreshCount', () => {
-        dispatch(UA.getPrvtMsgCount())
-      })
-    }
+    socket.once('refreshCount', () => {
+      dispatch(UA.getPrvtMsgCount())
+    })
   }, [socket, dispatch])
 
   return (
     <Router>
-      <Header socket={socket} />
+      <Header socket={socket} counter={counter} />
       <main>
         <Container>
           <Route
@@ -69,7 +73,9 @@ const App = () => {
 
           <Route
             path='/private/:id'
-            render={(e) => <PrivateRoom {...e} socket={socket} />}
+            render={(e) => (
+              <PrivateRoom {...e} socket={socket} counter={counter} />
+            )}
             exact
           />
 

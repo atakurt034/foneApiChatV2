@@ -25,7 +25,7 @@ import { UA } from '../../../actions/index'
 import { MyRooms } from '../StyledMyRooms'
 import { ModalLoader } from '../../ModalLoader'
 
-const Account = ({ history, socket }) => {
+const Account = ({ history, counter }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const dispatch = useDispatch()
   const theme = useTheme()
@@ -37,10 +37,9 @@ const Account = ({ history, socket }) => {
     (state) => state.userDetails
   )
   const { status } = useSelector((state) => state.userUpdate)
-  const { counter } = useSelector((state) => state.privateCount)
 
   const [{ name, image }, setUser] = React.useState({})
-  const [count, setCount] = React.useState(0)
+  const count = counter
 
   const handleClick = (event) => {
     event.preventDefault()
@@ -75,16 +74,6 @@ const Account = ({ history, socket }) => {
       />
     </StyledBadge>
   )
-  React.useEffect(() => {
-    dispatch(UA.getPrvtMsgCount())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  React.useEffect(() => {
-    if (counter) {
-      setCount(counter)
-    }
-  }, [counter, dispatch])
 
   React.useEffect(() => {
     if (userInfo) {
@@ -156,7 +145,7 @@ const Account = ({ history, socket }) => {
             to={`/private/${userInfo && userInfo._id}`}
           >
             <ListItemIcon>
-              <MyRooms setCounter={setCount} socket={socket} />
+              <MyRooms counter={counter} />
             </ListItemIcon>
             <ListItemText primary='Private Rooms' />
           </Link>

@@ -78,6 +78,9 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
 
   useEffect(() => {
     dispatch(UA.getPrivateRooms(id))
+    if (!loading) {
+      dispatch(UA.getPrvtMsgCount())
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -112,17 +115,6 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
       }
     }, time)
 
-    if (socket) {
-      socket.emit('privateJoin', { chatroomId })
-      socket.on('privateOutput', (data) => {
-        setResponse((prev) => [
-          ...prev,
-          { ...data, isSender: data.id === userInfo._id },
-        ])
-        scrollToBottom()
-      })
-    }
-
     return () => {
       //Component Unmount
       if (socket) {
@@ -136,16 +128,28 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
 
   useEffect(() => {
     if (socket) {
-      socket.on('privateLeave', ({ name }) => {
-        dispatch({ type: CHAT.CREATE_ROOM_RESET })
-        dispatch({ type: CHAT.GET_MESSAGES_RESET })
-        dispatch({ type: CHAT.GET_ROOMS_RESET })
-        dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
-        dispatch(UA.getPrvtMsgCount)
+      socket.emit('privateJoin', { chatroomId })
+      socket.on('privateOutput', (data) => {
+        setResponse((prev) => [
+          ...prev,
+          { ...data, isSender: data.id === userInfo._id },
+        ])
+        scrollToBottom()
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket])
+
+  useEffect(() => {
+    return () => {
+      dispatch({ type: CHAT.CREATE_ROOM_RESET })
+      dispatch({ type: CHAT.GET_MESSAGES_RESET })
+      dispatch({ type: CHAT.GET_ROOMS_RESET })
+      dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
+      dispatch(UA.getPrvtMsgCount())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const clickHandler = () => {
     if (socket) {
@@ -279,6 +283,7 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
 
                 {loading ? (
                   <>
+                    <SkeletonChat />
                     <SkeletonChat />
                     <SkeletonChat />
                   </>

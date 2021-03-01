@@ -17,7 +17,6 @@ export const privateJoin = (User, Message, socket, io) => async ({
     )
   }
   socket.join(chatroomId)
-  io.emit('refreshCount')
   io.to(chatroomId).emit('privateJoin', {
     name: user.name,
   })
@@ -40,7 +39,6 @@ export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
   image,
   chatroomId,
 }) => {
-  io.emit('refreshCount')
   if (message.trim().length > 0) {
     const id = socket.userId
     const user = await User.findById(id)
@@ -68,6 +66,7 @@ export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
       chatroomId,
       id: socket.userId,
     })
+
     await private_room.messages.push(message_created)
     await private_room.save()
   }
