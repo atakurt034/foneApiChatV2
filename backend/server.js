@@ -10,10 +10,6 @@ import { user, chatroom } from './routes/index.js'
 import jwt from 'jsonwebtoken'
 
 import morgan from 'morgan'
-import User from './models/user.js'
-import Chatroom from './models/chatrooms.js'
-import Message from './models/messages.js'
-import PrivateRoom from './models/privaterooms.js'
 
 import { PR, Private } from './socket_routes/index_socket.js'
 
@@ -70,24 +66,16 @@ io.use(async (socket, next) => {
   } catch (err) {}
 })
 
-const users = {}
-
 // returns the union of two arrays where duplicate objects with the same 'prop' are removed
 
 io.on('connect', (socket) => {
-  socket.on('joinRoom', PR.joinRoom(User, Chatroom, users, socket, io))
-  socket.on('leaveRoom', PR.leaveRoom(User, users, io, socket))
-  socket.on('input', PR.input(User, Chatroom, Message, io, socket))
+  socket.on('joinRoom', PR.joinRoom(io, socket))
+  socket.on('leaveRoom', PR.leaveRoom(io, socket))
+  socket.on('input', PR.input(io, socket))
   socket.on('kick', ({ user, chatroomId }) => {
     io.to(chatroomId).emit('kicked', { user, chatroomId })
   })
-  socket.on(
-    'privateJoin',
-    Private.privateJoin(User, Message, socket, io, users)
-  )
-  socket.on('privateLeave', Private.privateLeave(User, io, socket, users))
-  socket.on(
-    'privateInput',
-    Private.privateInput(User, PrivateRoom, Message, io, socket, users)
-  )
+  socket.on('privateJoin', Private.privateJoin(io, socket))
+  socket.on('privateLeave', Private.privateLeave(io, socket))
+  socket.on('privateInput', Private.privateInput(io, socket))
 })

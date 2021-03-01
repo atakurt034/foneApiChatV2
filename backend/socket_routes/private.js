@@ -1,9 +1,10 @@
 // private users
 const users = {}
+import User from '../models/user.js'
+import Message from '../models/messages.js'
+import PrivateRoom from '../models/privaterooms.js'
 
-export const privateJoin = (User, Message, socket, io) => async ({
-  chatroomId,
-}) => {
+export const privateJoin = (io, socket) => async ({ chatroomId }) => {
   const user = await User.findOne({ _id: socket.userId })
 
   users[socket.userId] = user._id
@@ -22,7 +23,7 @@ export const privateJoin = (User, Message, socket, io) => async ({
   })
 }
 
-export const privateLeave = (User, io, socket) => async ({ chatroomId }) => {
+export const privateLeave = (io, socket) => async ({ chatroomId }) => {
   const user = await User.findOne({ _id: socket.userId })
 
   delete users[socket.userId]
@@ -33,7 +34,7 @@ export const privateLeave = (User, io, socket) => async ({ chatroomId }) => {
   socket.leave(chatroomId)
 }
 
-export const privateInput = (User, PrivateRoom, Message, io, socket) => async ({
+export const privateInput = (io, socket) => async ({
   message,
   name,
   image,

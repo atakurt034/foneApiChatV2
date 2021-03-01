@@ -1,6 +1,9 @@
-export const joinRoom = (User, Chatroom, users, socket, io) => async ({
-  chatroomId,
-}) => {
+const users = {}
+import User from '../models/user.js'
+import Message from '../models/messages.js'
+import Chatroom from '../models/chatrooms.js'
+
+export const joinRoom = (io, socket) => async ({ chatroomId }) => {
   const user = await User.findOne({ _id: socket.userId })
   const chatroom = await Chatroom.findById(chatroomId)
 
@@ -24,9 +27,7 @@ export const joinRoom = (User, Chatroom, users, socket, io) => async ({
   await chatroom.save()
 }
 
-export const leaveRoom = (User, users, io, socket) => async ({
-  chatroomId,
-}) => {
+export const leaveRoom = (io, socket) => async ({ chatroomId }) => {
   const user = await User.findOne({ _id: socket.userId })
 
   delete users[socket.userId]
@@ -39,7 +40,7 @@ export const leaveRoom = (User, users, io, socket) => async ({
   socket.leave(chatroomId)
 }
 
-export const input = (User, Chatroom, Message, io, socket) => async ({
+export const input = (io, socket) => async ({
   message,
   name,
   image,
