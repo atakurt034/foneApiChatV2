@@ -162,17 +162,7 @@ export const privateRooms = asyncHandler(async (req, res) => {
 export const getPrivateMsgs = asyncHandler(async (req, res) => {
   const id = req.user._id
   try {
-    const user = await User.find({ _id: id })
-      .select('messages')
-      .populate({
-        path: 'privateRooms',
-        select: 'messages',
-        populate: {
-          path: 'messages',
-          select: 'seenBy -_id',
-          match: { seenBy: { $nin: id } },
-        },
-      })
+    const user = await User.privateCount(id)
     res.json(user)
     res.status(204)
   } catch (error) {

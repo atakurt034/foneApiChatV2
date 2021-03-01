@@ -37,6 +37,20 @@ const userSchema = new mongoose.Schema(
   }
 )
 
+userSchema.statics.privateCount = async function (id) {
+  return await this.find({ _id: id })
+    .select('messages')
+    .populate({
+      path: 'privateRooms',
+      select: 'messages',
+      populate: {
+        path: 'messages',
+        select: 'seenBy -_id',
+        match: { seenBy: { $nin: id } },
+      },
+    })
+}
+
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password)
 }
