@@ -7,7 +7,6 @@ import ChatIcon from '@material-ui/icons/Chat'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { UA } from '../../actions/index'
-import axios from 'axios'
 
 const StyledBadge = withStyles((theme) => ({
   badge: {
@@ -21,50 +20,24 @@ export const MyRooms = ({ socket }) => {
   const dispatch = useDispatch()
 
   const { userInfo } = useSelector((state) => state.userLogin)
-  const { messages, loading, error } = useSelector((state) => state.privateMsg)
+  const { counter } = useSelector((state) => state.privateCount)
+
+  const [count, setCount] = React.useState(0)
 
   React.useEffect(() => {
-    if (messages) {
-    }
-  }, [messages])
-
-  const count = 1
-
-  React.useEffect(() => {
-    if (socket) {
-      const getmessage = async () => {
-        const config = {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        }
-        const { data } = await axios.get(
-          '/api/chatrooms/private/message',
-          config
-        )
-
-        const seenBy = data.map((data) =>
-          data.privateRooms.map((privateRooms, index1) =>
-            privateRooms.messages.map((messages, index2) =>
-              messages.seenBy.map((seenBy, index3) => index3)
-            )
-          )
-        )
-        console.log(data)
-      }
+    if (socket && userInfo) {
       socket.on('privateOutput', () => {
-        dispatch(UA.getPrivateMsgs())
-
-        getmessage()
+        dispatch(UA.getPrvtMsgCount())
       })
-      getmessage()
+    }
+    if (counter) {
+      setCount(counter)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket])
+  }, [socket, counter])
 
   React.useEffect(() => {
-    dispatch(UA.getPrivateMsgs())
+    dispatch(UA.getPrvtMsgCount())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return (

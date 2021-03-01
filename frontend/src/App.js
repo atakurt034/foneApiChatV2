@@ -9,12 +9,15 @@ import { UserChat } from './screens/userChatroom/user'
 import { Profile } from './screens/profile/profile'
 import { PrivateRoom } from './screens/privateRoom/privateRoom'
 
+import { UA } from './actions/index'
+
 import { io } from 'socket.io-client'
 
 import Header from './components/Header'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
+  const dispatch = useDispatch()
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
 
@@ -30,6 +33,14 @@ const App = () => {
   })
 
   socket.connect()
+
+  React.useEffect(() => {
+    if (socket) {
+      socket.on('refreshCount', () => {
+        dispatch(UA.getPrvtMsgCount())
+      })
+    }
+  }, [socket, dispatch])
 
   return (
     <Router>

@@ -37,8 +37,10 @@ const Account = ({ history, socket }) => {
     (state) => state.userDetails
   )
   const { status } = useSelector((state) => state.userUpdate)
+  const { counter } = useSelector((state) => state.privateCount)
 
   const [{ name, image }, setUser] = React.useState({})
+  const [count, setCount] = React.useState(0)
 
   const handleClick = (event) => {
     event.preventDefault()
@@ -52,6 +54,7 @@ const Account = ({ history, socket }) => {
     dispatch(UA.logout())
     handleClose()
   }
+
   let size = 'small'
   if (sm) {
     size = 'large'
@@ -63,7 +66,7 @@ const Account = ({ history, socket }) => {
         vertical: 'bottom',
         horizontal: 'right',
       }}
-      variant='dot'
+      variant={count > 0 ? 'dot' : 'standard'}
     >
       <Avatar
         src={userInfo ? image : ''}
@@ -72,6 +75,17 @@ const Account = ({ history, socket }) => {
       />
     </StyledBadge>
   )
+  React.useEffect(() => {
+    dispatch(UA.getPrvtMsgCount())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  React.useEffect(() => {
+    if (counter) {
+      setCount(counter)
+    }
+  }, [counter, dispatch])
+
   React.useEffect(() => {
     if (userInfo) {
       dispatch(UA.getUserDetails())
@@ -142,7 +156,7 @@ const Account = ({ history, socket }) => {
             to={`/private/${userInfo && userInfo._id}`}
           >
             <ListItemIcon>
-              <MyRooms socket={socket} />
+              <MyRooms setCounter={setCount} socket={socket} />
             </ListItemIcon>
             <ListItemText primary='Private Rooms' />
           </Link>

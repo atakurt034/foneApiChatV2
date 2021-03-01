@@ -21,22 +21,18 @@ import { CHAT } from '../../constants/index'
 import { useDispatch, useSelector } from 'react-redux'
 
 import SendIcon from '@material-ui/icons/Send'
-import { ModalLoader } from '../../components/ModalLoader'
 import { ModalMessage } from '../../components/ModalMessage'
 
 import { TextDivider } from '../../components/divider'
 import axios from 'axios'
 
-import { Skeleton } from '@material-ui/lab'
-import { SnackbarProvider, useSnackbar } from 'notistack'
-
 import { useStyles } from './styles'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 import { ChipUser } from '../../components/user/userChip'
+import { SkeletonChat } from '../../components/skeletonChat'
 
-const Chat = ({ history, match, socket, sendChatroomId }) => {
+export const UserChat = ({ history, match, socket, sendChatroomId }) => {
   const classes = useStyles()
-  const { enqueueSnackbar } = useSnackbar()
   const dispatch = useDispatch()
   const theme = useTheme()
   const sm = useMediaQuery(theme.breakpoints.down('sm'))
@@ -140,31 +136,12 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
 
   useEffect(() => {
     if (socket) {
-      socket.on('privateJoin', ({ name }) => {
-        enqueueSnackbar(`${name} entered`, {
-          anchorOrigin: {
-            vertical: 'top',
-            horizontal: 'right',
-          },
-          variant: 'success',
-          autoHideDuration: 500,
-        })
-      })
-
       socket.on('privateLeave', ({ name }) => {
-        enqueueSnackbar(`${name} left`, {
-          anchorOrigin: {
-            vertical: 'top',
-            horizontal: 'right',
-          },
-          variant: 'error',
-          autoHideDuration: 500,
-        })
-
         dispatch({ type: CHAT.CREATE_ROOM_RESET })
         dispatch({ type: CHAT.GET_MESSAGES_RESET })
         dispatch({ type: CHAT.GET_ROOMS_RESET })
         dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
+        dispatch(UA.getPrvtMsgCount)
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -222,9 +199,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
     }
   }
 
-  return loading ? (
-    <ModalLoader />
-  ) : error ? (
+  return error ? (
     <ModalMessage variant='error'>{error}</ModalMessage>
   ) : (
     <Grid container justify='center' style={{ padding: 20 }}>
@@ -277,33 +252,7 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                 )}
 
                 {isLoading ? (
-                  <>
-                    <Skeleton
-                      variant='rect'
-                      style={{
-                        padding: '10px 0',
-                        margin: '10px 0',
-                        width: '80%',
-                      }}
-                    />
-                    <Skeleton
-                      variant='rect'
-                      style={{
-                        padding: '10px 0',
-                        margin: '10px 0',
-                        width: '80%',
-                        marginLeft: 'auto',
-                      }}
-                    />
-                    <Skeleton
-                      variant='rect'
-                      style={{
-                        padding: '10px 0',
-                        margin: '10px 0',
-                        width: '80%',
-                      }}
-                    />
-                  </>
+                  <SkeletonChat />
                 ) : (
                   oldMsg.map((text, index) => (
                     <Paper
@@ -328,27 +277,38 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                   ))
                 )}
 
-                {response.map((text, index) => (
-                  <Paper
-                    elevation={12}
-                    key={index}
-                    className={
-                      text.isSender ? classes.sender : classes.reciever
-                    }
-                    style={{ padding: '5px 0', margin: '10px 0', width: '80%' }}
-                  >
-                    <ChipUser
-                      text={text}
-                      history={history}
-                      socket={socket}
-                      chatroomId={chatroomId}
-                    />
+                {loading ? (
+                  <>
+                    <SkeletonChat />
+                    <SkeletonChat />
+                  </>
+                ) : (
+                  response.map((text, index) => (
+                    <Paper
+                      elevation={12}
+                      key={index}
+                      className={
+                        text.isSender ? classes.sender : classes.reciever
+                      }
+                      style={{
+                        padding: '5px 0',
+                        margin: '10px 0',
+                        width: '80%',
+                      }}
+                    >
+                      <ChipUser
+                        text={text}
+                        history={history}
+                        socket={socket}
+                        chatroomId={chatroomId}
+                      />
 
-                    <Typography variant='body2' className={classes.text}>
-                      {text.message}
-                    </Typography>
-                  </Paper>
-                ))}
+                      <Typography variant='body2' className={classes.text}>
+                        {text.message}
+                      </Typography>
+                    </Paper>
+                  ))
+                )}
 
                 <div
                   ref={myRef}
@@ -375,18 +335,5 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
         </Card>
       </Grid>
     </Grid>
-  )
-}
-
-export const UserChat = ({ history, match, socket, sendChatroomId }) => {
-  return (
-    <SnackbarProvider maxSnack={6}>
-      <Chat
-        history={history}
-        match={match}
-        socket={socket}
-        sendChatroomId={sendChatroomId}
-      />
-    </SnackbarProvider>
   )
 }

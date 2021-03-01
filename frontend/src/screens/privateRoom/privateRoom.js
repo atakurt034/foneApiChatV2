@@ -10,7 +10,7 @@ import {
   useTheme,
 } from '@material-ui/core'
 
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import ChatIcon from '@material-ui/icons/Chat'
 import { ModalLoader } from '../../components/ModalLoader'
@@ -19,8 +19,10 @@ import { useStyles } from './styles'
 
 import { SnackbarProvider, useSnackbar } from 'notistack'
 import axios from 'axios'
+import { UA } from '../../actions/index'
 
 const Handler = ({ history, socket }) => {
+  const dispatch = useDispatch()
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const theme = useTheme()
@@ -28,9 +30,11 @@ const Handler = ({ history, socket }) => {
 
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo, loading, error } = userLogin
+  const { counter } = useSelector((state) => state.privateCount)
 
   const [chatrooms, setChatrooms] = React.useState([])
   const [rooms, setRooms] = React.useState([])
+  const [count, setCount] = React.useState(0)
 
   React.useEffect(() => {
     if (!userInfo) {
@@ -65,7 +69,7 @@ const Handler = ({ history, socket }) => {
     if (!userInfo) {
       history.push('/login')
     }
-    if (rooms) {
+    if (rooms && userInfo) {
       const private_rooms = rooms.map((room, index) => {
         return {
           ...room,
@@ -78,18 +82,26 @@ const Handler = ({ history, socket }) => {
     }
   }, [rooms, userInfo, history])
 
-  const [datas, setDatas] = React.useState([])
+  React.useEffect(() => {
+    dispatch(UA.getPrvtMsgCount())
+    if (counter) {
+      setCount(counter)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   React.useEffect(() => {
     if (socket) {
-      socket.on('publicJoin', (data) => {
-        setDatas(Object.values(data))
-      })
-      socket.on('publicLeave', (data) => {
-        setDatas(Object.values(data))
+      socket.on('refreshCount', () => {
+        dispatch(UA.getPrvtMsgCount())
+        if (counter) {
+          setCount(counter)
+        }
       })
     }
-  }, [socket, datas])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket, counter])
 
   const clickHandler = (user) => {
     const name = user.name.find((x) => typeof x === 'string')
@@ -177,6 +189,18 @@ const Handler = ({ history, socket }) => {
                               {chatroom.name}
                             </Typography>
                           </Grid>
+                          {count > 0 && (
+                            <div>
+                              <Typography color='error' component='span'>
+                                {count}
+                              </Typography>
+                              <Typography variant='body2' component='span'>
+                                {count > 1
+                                  ? ' unread messages'
+                                  : ' unread message'}
+                              </Typography>
+                            </div>
+                          )}
                           <Grid item xs={4} md={2}>
                             {sm ? (
                               <IconButton

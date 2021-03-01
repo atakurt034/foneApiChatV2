@@ -87,3 +87,18 @@ export const getPrivateMsgReducer = (state = {}, action) => {
       return state
   }
 }
+
+export const getPrvtMsgCountReducer = (state = { count: 0 }, action) => {
+  switch (action.type) {
+    case USER.PRIVATE_MESSAGE_COUNT_REQUEST:
+      return { loading: true }
+    case USER.PRIVATE_MESSAGE_COUNT_SUCCESS:
+      return { loading: false, counter: action.payload }
+    case USER.PRIVATE_MESSAGE_COUNT_FAIL:
+      return { loading: false, error: action.payload }
+    case USER.PRIVATE_MESSAGE_COUNT_RESET:
+      return {}
+    default:
+      return state
+  }
+}

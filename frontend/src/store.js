@@ -11,6 +11,7 @@ const reducer = combineReducers({
   userUpdate: USER.userUpdateReducer,
   privateRooms: USER.getPrivateRoomsReducer,
   privateMsg: USER.getPrivateMsgReducer,
+  privateCount: USER.getPrvtMsgCountReducer,
   getRooms: CHAT.getRoomsReducer,
   createRoom: CHAT.createRoomsReducer,
   getRoomDetails: CHAT.getRoomDetailsReducer,
