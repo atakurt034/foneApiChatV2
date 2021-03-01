@@ -74,7 +74,7 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
       setChatroomId(private_room._id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [private_room, rooms])
+  }, [private_room])
 
   useEffect(() => {
     dispatch(UA.getPrivateRooms(id))
@@ -90,7 +90,7 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
     }
     if (rooms) {
       setChatname(name)
-      rooms.messages.map((i) =>
+      rooms.messages.reverse().map((i) =>
         setResponse((prev) => [
           ...prev,
           {
@@ -135,6 +135,7 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
           { ...data, isSender: data.id === userInfo._id },
         ])
         scrollToBottom()
+        dispatch(UA.getPrvtMsgCount())
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

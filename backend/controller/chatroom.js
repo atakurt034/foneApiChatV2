@@ -147,6 +147,11 @@ export const privateRooms = asyncHandler(async (req, res) => {
             path: 'messages',
             model: 'Message',
             populate: { path: 'user', select: 'name image' },
+            options: {
+              limit: 10,
+              skip: 1 - 1,
+              sort: { createdAt: -1 },
+            },
           },
           { path: 'users', select: 'name' },
         ],

@@ -13,7 +13,7 @@ import {
 
 import { useDispatch, useSelector } from 'react-redux'
 
-import { CA } from '../../actions/index'
+import { CA, UA } from '../../actions/index'
 import { CHAT } from '../../constants/index'
 
 import ChatIcon from '@material-ui/icons/Chat'
@@ -152,6 +152,19 @@ const Handler = ({ history, socket }) => {
       })
     }
   }, [socket, datas])
+
+  React.useEffect(() => {
+    dispatch(UA.getPrvtMsgCount())
+    if (socket) {
+      socket.on('refreshCount', () => {
+        dispatch(UA.getPrvtMsgCount())
+      })
+    }
+    return () => {
+      dispatch(UA.getPrvtMsgCount())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const clickHandler = (id) => {
     history.push(`/chatroom/${id}`)
