@@ -54,6 +54,8 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
     (state) => state.privateRooms
   )
 
+  const { loading: loadingCount } = useSelector((state) => state.privateCount)
+
   const name = match.params.name
   const id = history.location.search.split('=')[1]
 
@@ -78,9 +80,6 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
 
   useEffect(() => {
     dispatch(UA.getPrivateRooms(id))
-    if (!loading) {
-      dispatch(UA.getPrvtMsgCount())
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -105,6 +104,7 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
   }, [userInfo, history, rooms, name])
 
   //**************************** socket *********************************//
+  const [sent, setSent] = React.useState(false)
   useEffect(() => {
     let time = 1000
     setTimeout(() => {
@@ -112,12 +112,17 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
         time += 1
       } else {
         scrollToBottom()
+        if (!sent && !loadingCount) {
+          dispatch(UA.getPrvtMsgCount())
+          setSent(true)
+        }
       }
     }, time)
 
     return () => {
       //Component Unmount
       if (socket) {
+        setSent(true)
         socket.emit('privateLeave', {
           chatroomId,
         })
@@ -135,7 +140,6 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
           { ...data, isSender: data.id === userInfo._id },
         ])
         scrollToBottom()
-        dispatch(UA.getPrvtMsgCount())
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,7 +151,6 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
       dispatch({ type: CHAT.GET_MESSAGES_RESET })
       dispatch({ type: CHAT.GET_ROOMS_RESET })
       dispatch({ type: CHAT.GET_ROOM_DETAILS_RESET })
-      dispatch(UA.getPrvtMsgCount())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -287,39 +290,42 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
                     <SkeletonChat />
                     <SkeletonChat />
                     <SkeletonChat />
+                    <SkeletonChat />
+                    <SkeletonChat />
                   </>
                 ) : (
                   response.map((text, index) => (
-                    <Paper
-                      elevation={12}
-                      key={index}
-                      className={
-                        text.isSender ? classes.sender : classes.reciever
-                      }
-                      style={{
-                        padding: '5px 0',
-                        margin: '10px 0',
-                        width: '80%',
-                      }}
-                    >
-                      <ChipUser
-                        text={text}
-                        history={history}
-                        socket={socket}
-                        chatroomId={chatroomId}
-                      />
+                    <React.Fragment key={index}>
+                      <Paper
+                        elevation={12}
+                        className={
+                          text.isSender ? classes.sender : classes.reciever
+                        }
+                        style={{
+                          padding: '5px 0',
+                          margin: '10px 0',
+                          width: '80%',
+                        }}
+                      >
+                        <ChipUser
+                          text={text}
+                          history={history}
+                          socket={socket}
+                          chatroomId={chatroomId}
+                        />
 
-                      <Typography variant='body2' className={classes.text}>
-                        {text.message}
-                      </Typography>
-                    </Paper>
+                        <Typography variant='body2' className={classes.text}>
+                          {text.message}
+                        </Typography>
+                      </Paper>
+                    </React.Fragment>
                   ))
                 )}
 
                 <div
                   ref={myRef}
                   style={{ float: 'right', clear: 'both', padding: 10 }}
-                />
+                ></div>
               </Box>
             </Paper>
           </CardContent>
@@ -327,9 +333,10 @@ export const UserChat = ({ history, match, socket, sendChatroomId }) => {
           <CardActions>
             <Paper className={classes.root}>
               <InputBase
+                autoFocus={true}
                 inputRef={textRef}
                 className={classes.input}
-                placeholder='Type Here'
+                placeholder={'Type Here'}
                 type='text'
                 onKeyUp={changeHandler}
               />

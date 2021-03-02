@@ -165,11 +165,11 @@ export const privateRooms = asyncHandler(async (req, res) => {
 })
 
 export const getPrivateMsgs = asyncHandler(async (req, res) => {
-  const id = req.user._id
   try {
+    const id = req.user._id
     const user = await User.privateCount(id)
     res.json(user)
-    res.status(204)
+    res.status(304)
   } catch (error) {
     res.status(500)
     throw new Error(error)

@@ -372,10 +372,9 @@ const Chat = ({ history, match, socket, sendChatroomId, setPrvtRoomId }) => {
                 )}
 
                 {response.map((text, index) => (
-                  <>
+                  <React.Fragment key={index}>
                     <Paper
                       elevation={12}
-                      key={index}
                       className={
                         text.isSender
                           ? arrayFilter(response, 'sender') === index
@@ -414,7 +413,7 @@ const Chat = ({ history, match, socket, sendChatroomId, setPrvtRoomId }) => {
                         </Typography>
                       </Box>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
 
                 <div

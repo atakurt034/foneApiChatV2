@@ -5,9 +5,9 @@ import { Chatroom } from './screens/chatroom/chatroom'
 import { LoginScreen } from './screens/LoginScreen/LoginScreen'
 import { RegisterScreen } from './screens/RegisterScreen/RegisterScreen'
 import { Dashboard } from './screens/dashboard/dashboard'
-import { UserChat } from './screens/userChatroom/user'
+import { UserChat } from './screens/userPrivateChat/user'
 import { Profile } from './screens/profile/profile'
-import { PrivateRoom } from './screens/privateRoom/privateRoom'
+import { PrivateRoom } from './screens/MyPrivateRooms/privateRoom'
 
 import { UA } from './actions/index'
 
@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from 'react-redux'
 const App = () => {
   const dispatch = useDispatch()
   const { userInfo } = useSelector((state) => state.userLogin)
-  const { counter } = useSelector((state) => state.privateCount)
+  const { counter, loading } = useSelector((state) => state.privateCount)
 
   const [chatroomId, setChatroomId] = React.useState('')
 
@@ -34,17 +34,28 @@ const App = () => {
 
   socket.connect()
   React.useEffect(() => {
+    if (socket && !loading) {
+      socket.on('refreshCount', () => {
+        dispatch(UA.getPrvtMsgCount())
+      })
+    }
+  }, [socket, loading, dispatch])
+
+  React.useEffect(() => {
     if (userInfo) {
       dispatch(UA.getPrvtMsgCount())
+      if (socket) {
+        socket.emit('online', { chatroomId: userInfo._id })
+      }
+    }
+
+    return () => {
+      if (socket) {
+        socket.emit('offline')
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userInfo])
-
-  React.useEffect(() => {
-    socket.once('refreshCount', () => {
-      dispatch(UA.getPrvtMsgCount())
-    })
-  }, [socket, dispatch])
 
   return (
     <Router>
@@ -80,7 +91,10 @@ const App = () => {
           />
 
           <Route path='/profile' component={Profile} exact />
-          <Route path='/login' component={LoginScreen} />
+          <Route
+            path='/login'
+            render={(e) => <LoginScreen {...e} socket={socket} />}
+          />
           <Route path='/register' component={RegisterScreen} />
 
           <Route

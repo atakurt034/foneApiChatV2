@@ -4,6 +4,34 @@ import User from '../models/user.js'
 import Message from '../models/messages.js'
 import PrivateRoom from '../models/privaterooms.js'
 
+export const listener = (io, socket) => async (eventNames, args) => {
+  if (eventNames === 'privateInput') {
+    const id = args.chatroomId
+    const room = await PrivateRoom.findById(id)
+      .select('users -_id')
+      .populate({
+        path: 'users',
+        model: 'User',
+        select: '_id',
+        match: { _id: { $ne: socket.userId } },
+      })
+    const roomId = room.users[0]._id.toString()
+    io.to(roomId).emit('refreshCount')
+  }
+}
+
+export const online = (io, socket) => async () => {
+  const chatroomId = socket.userId
+
+  socket.join(chatroomId)
+}
+
+export const offline = (io, socket) => async () => {
+  const chatroomId = socket.userId
+  socket.leave(chatroomId)
+  io.to(chatroomId).emit('userOffline')
+}
+
 export const privateJoin = (io, socket) => async ({ chatroomId }) => {
   const user = await User.findOne({ _id: socket.userId })
 
@@ -20,6 +48,7 @@ export const privateJoin = (io, socket) => async ({ chatroomId }) => {
   socket.join(chatroomId)
   io.to(chatroomId).emit('privateJoin', {
     name: user.name,
+    from: 'server',
   })
 }
 
@@ -43,8 +72,8 @@ export const privateInput = (io, socket) => async ({
   if (message.trim().length > 0) {
     const id = socket.userId
     const user = await User.findById(id)
-    let private_room
     let userList = Object.values(users)
+    let private_room
 
     if (chatroomId) {
       private_room = await PrivateRoom.findById(chatroomId)
@@ -59,7 +88,6 @@ export const privateInput = (io, socket) => async ({
       seenBy: userList,
     })
     const message_created = await newMessage.save()
-
     io.to(chatroomId).emit('privateOutput', {
       message,
       name,

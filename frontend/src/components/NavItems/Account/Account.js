@@ -25,7 +25,7 @@ import { UA } from '../../../actions/index'
 import { MyRooms } from '../StyledMyRooms'
 import { ModalLoader } from '../../ModalLoader'
 
-const Account = ({ history, counter }) => {
+const Account = ({ history, counter, socket }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const dispatch = useDispatch()
   const theme = useTheme()

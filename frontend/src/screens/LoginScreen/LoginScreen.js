@@ -21,7 +21,7 @@ import { UA } from '../../actions/index'
 import { ModalLoader } from '../../components/ModalLoader'
 import { ModalMessage } from '../../components/ModalMessage'
 
-export const LoginScreen = ({ history }) => {
+export const LoginScreen = ({ history, socket }) => {
   const dispatch = useDispatch()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -33,7 +33,7 @@ export const LoginScreen = ({ history }) => {
     if (userInfo && !loading) {
       history.push('/')
     }
-  }, [history, userInfo, loading])
+  }, [history, userInfo, loading, socket])
 
   const submitHandler = (e) => {
     e.preventDefault()

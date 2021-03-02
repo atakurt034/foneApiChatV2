@@ -173,7 +173,7 @@ export const getPrivateMsgs = () => async (dispatch, getState) => {
   }
 }
 
-export const getPrvtMsgCount = (params) => async (dispatch, getState) => {
+export const getPrvtMsgCount = () => async (dispatch, getState) => {
   try {
     dispatch({ type: USER.PRIVATE_MESSAGE_COUNT_REQUEST })
     const {
@@ -182,21 +182,22 @@ export const getPrvtMsgCount = (params) => async (dispatch, getState) => {
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
 
     const { data } = await axios.get('/api/chatrooms/private/message', config)
     const counter = []
-
-    data.map((data) =>
-      data.privateRooms.map((privateRooms, index1) =>
-        privateRooms.messages.map((messages, index2) =>
-          messages.seenBy.map((seenBy, index3) => counter.push(seenBy))
+    if (data) {
+      data.map((data) =>
+        data.privateRooms.map((privateRooms, index1) =>
+          privateRooms.messages.map((messages, index2) =>
+            messages.seenBy.map((seenBy, index3) => counter.push(seenBy))
+          )
         )
       )
-    )
+    }
     dispatch({
       type: USER.PRIVATE_MESSAGE_COUNT_SUCCESS,
       payload: counter.length,

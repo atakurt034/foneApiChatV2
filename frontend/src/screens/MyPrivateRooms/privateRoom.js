@@ -145,15 +145,15 @@ const Handler = ({ history, counter }) => {
                   }}
                 >
                   {chatrooms.length > 0 &&
-                    chatrooms.map((chatroom) => (
+                    chatrooms.map((chatroom, index) => (
                       <Paper
+                        key={index}
                         elevation={4}
                         style={{
                           width: '100%',
                           margin: '8px auto',
                           maxHeight: '90px',
                         }}
-                        key={chatroom._id}
                       >
                         <Grid
                           container

@@ -4,7 +4,7 @@ import Message from '../models/messages.js'
 import Chatroom from '../models/chatrooms.js'
 
 export const joinRoom = (io, socket) => async ({ chatroomId }) => {
-  const user = await User.findOne({ _id: socket.userId })
+  const user = await User.findOne({ _id: socket.userId }).select('-password')
   const chatroom = await Chatroom.findById(chatroomId)
 
   const userExist = chatroom.users.find(

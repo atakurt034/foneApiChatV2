@@ -12,6 +12,10 @@ import jwt from 'jsonwebtoken'
 import morgan from 'morgan'
 
 import { PR, Private } from './socket_routes/index_socket.js'
+import Message from './models/messages.js'
+import User from './models/user.js'
+import mongoose from 'mongoose'
+import PrivateRoom from './models/privaterooms.js'
 
 dotenv.config()
 const app = express()
@@ -78,4 +82,7 @@ io.on('connect', (socket) => {
   socket.on('privateJoin', Private.privateJoin(io, socket))
   socket.on('privateLeave', Private.privateLeave(io, socket))
   socket.on('privateInput', Private.privateInput(io, socket))
+  socket.on('online', Private.online(io, socket))
+  socket.on('offline', Private.offline(io, socket))
+  socket.onAny(Private.listener(io, socket))
 })
