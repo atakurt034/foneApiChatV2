@@ -6,26 +6,39 @@ export const SkeletonChat = () => {
       <Skeleton
         variant='rect'
         style={{
-          padding: '10px 0',
-          margin: '10px 0',
-          width: '80%',
+          borderRadius: 20,
+          padding: '19px 0',
+          margin: '20px 0',
+          width: '60%',
         }}
       />
       <Skeleton
         variant='rect'
         style={{
-          padding: '10px 0',
-          margin: '10px 0',
-          width: '80%',
+          borderRadius: 20,
+          padding: '19px 0',
+          margin: '20px 0',
+          width: '60%',
           marginLeft: 'auto',
         }}
       />
       <Skeleton
         variant='rect'
         style={{
-          padding: '10px 0',
-          margin: '10px 0',
-          width: '80%',
+          borderRadius: 20,
+          padding: '19px 0',
+          margin: '20px 0',
+          width: '60%',
+        }}
+      />
+      <Skeleton
+        variant='rect'
+        style={{
+          borderRadius: 20,
+          padding: '19px 0',
+          margin: '20px 0',
+          width: '60%',
+          marginLeft: 'auto',
         }}
       />
     </>

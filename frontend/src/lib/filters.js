@@ -1,4 +1,4 @@
-export const filter_room = (users, chatroomId) => {
+export const room = (users, chatroomId) => {
   const room = Object.values(users).filter(
     (user) => user.chatroomId === chatroomId
   )
@@ -11,14 +11,14 @@ export const filter_room = (users, chatroomId) => {
   }
 }
 
-export const arrayFilter = (array, type) => {
+export const array = (array, type) => {
   let indexes
   const arrIndex = []
-  if (type === 'reciever') {
-    array.map((user, index) => !user.isSender && arrIndex.push(index))
+  if (type === 'yours') {
+    array.map((user, index) => !user.isMine && arrIndex.push(index))
     indexes = arrIndex[arrIndex.length - 1]
   } else {
-    array.map((user, index) => user.isSender && arrIndex.push(index))
+    array.map((user, index) => user.isMine && arrIndex.push(index))
     indexes = arrIndex[arrIndex.length - 1]
   }
 

@@ -17,9 +17,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { UA } from '../../actions/index'
 import { USER as UC } from '../../constants/index'
 
+import { CMP } from '../../components/index'
+
 import { ModalLoader } from '../../components/ModalLoader'
 import { ModalMessage } from '../../components/ModalMessage'
-import Toast from '../../components/Toast'
 import axios from 'axios'
 
 export const Profile = () => {
@@ -39,7 +40,7 @@ export const Profile = () => {
     if (password === confirmPassword) {
       dispatch(UA.userUpdateProfile({ name, image, email, password }))
     } else {
-      Toast('error', 'Passwords do not match', 'notification')
+      CMP.makeToast('error', 'Passwords do not match', 'notification')
     }
   }
 
@@ -82,7 +83,7 @@ export const Profile = () => {
       setUser(details)
     }
     if (status === 200) {
-      Toast('success', 'Updated', 'notification')
+      CMP.makeToast('success', 'Updated', 'notification')
       dispatch(UA.getUserDetails())
       dispatch({ type: UC.UPDATE_RESET })
     }

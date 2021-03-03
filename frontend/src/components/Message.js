@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function Message({ variant, children }) {
+export const Message = ({ variant, children }) => {
   const classes = useStyles()
 
   return (

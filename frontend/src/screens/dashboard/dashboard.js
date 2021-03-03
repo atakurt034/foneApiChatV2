@@ -155,7 +155,9 @@ const Handler = ({ history, socket }) => {
 
   React.useEffect(() => {
     dispatch(UA.getPrvtMsgCount())
-
+    return () => {
+      setChatrooms([])
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

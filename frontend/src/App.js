@@ -13,7 +13,7 @@ import { UA } from './actions/index'
 
 import { io } from 'socket.io-client'
 
-import Header from './components/Header'
+import { Header } from './components/Header'
 import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {

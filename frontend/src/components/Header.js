@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Header = ({ socket, counter }) => {
+export const Header = ({ socket, counter }) => {
   const classes = useStyles()
 
   return (
@@ -32,5 +32,3 @@ const Header = ({ socket, counter }) => {
     </AppBar>
   )
 }
-
-export default Header

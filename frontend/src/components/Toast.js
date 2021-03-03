@@ -21,7 +21,7 @@ const confirm = Swal.mixin({
   confirmButtonText: 'Yes, delete it!',
 })
 
-const makeToast = (icon, msg, type, data) => {
+export const makeToast = async (icon, msg, type, data) => {
   switch (type) {
     case 'notification':
       return notification.fire({
@@ -30,11 +30,10 @@ const makeToast = (icon, msg, type, data) => {
       })
 
     case 'confirm':
-      return confirm
-        .fire({
-          text: `You won't be able to revert this!`,
-        })
-        .then((result) => data(result.isConfirmed))
+      const result = await confirm.fire({
+        text: `You won't be able to revert this!`,
+      })
+      return data(result.isConfirmed)
     default:
       return notification.fire({
         icon: 'error',
@@ -42,5 +41,3 @@ const makeToast = (icon, msg, type, data) => {
       })
   }
 }
-
-export default makeToast

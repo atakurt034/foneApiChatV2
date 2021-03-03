@@ -56,7 +56,7 @@ export const input = (io, socket) => async ({
       chatroomId,
     })
 
-    chatroom.messages.push(newMessage)
+    await chatroom.messages.push(newMessage)
 
     io.to(chatroomId).emit('output', {
       message,

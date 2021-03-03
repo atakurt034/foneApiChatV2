@@ -65,7 +65,7 @@ const Account = ({ history, counter, socket }) => {
         vertical: 'bottom',
         horizontal: 'right',
       }}
-      variant={count > 0 ? 'dot' : 'standard'}
+      variant={count ? 'dot' : 'standard'}
     >
       <Avatar
         src={userInfo ? image : ''}
