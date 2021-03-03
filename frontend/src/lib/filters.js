@@ -13,11 +13,13 @@ export const room = (users, chatroomId) => {
 
 export const last_sent = (DataArray, type) => {
   let array = []
-  let rs = DataArray.map(({ isMine }, index) => (isMine ? true : false))
+  let result = DataArray.map(({ isMine }) => (isMine ? true : false))
+
   if (type === 'yours') {
-    rs = DataArray.map(({ isMine }, index) => (!isMine ? true : false))
+    result = DataArray.map(({ isMine }) => (!isMine ? true : false))
   }
-  rs.map((rs, index) =>
+
+  result.map((rs, index) =>
     index === 0
       ? array.push({ index: index, prev: false })
       : rs &&
@@ -26,6 +28,8 @@ export const last_sent = (DataArray, type) => {
           prev: array.some((x) => x.index === index - 1),
         })
   )
-  array.map((x, i) => (x['next'] = rs.some((xs, i) => xs && i === x.index + 1)))
+  array.map(
+    (x, i) => (x['next'] = result.some((xs, i) => xs && i === x.index + 1))
+  )
   return array
 }
