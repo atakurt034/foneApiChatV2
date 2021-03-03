@@ -313,7 +313,23 @@ const Chat = ({ history, match, socket, sendChatroomId }) => {
                   >
                     <Paper
                       style={{ borderRadius: 20 }}
-                      className={'message last'}
+                      className={
+                        text.isMine
+                          ? filter
+                              .last_sent(response, 'mine')
+                              .map((x, i) =>
+                                x.index === index && !x.next
+                                  ? 'message mine last'
+                                  : 'message mine'
+                              )
+                          : filter
+                              .last_sent(response, 'yours')
+                              .map((x, i) =>
+                                x.index === index && !x.next
+                                  ? 'message yours last'
+                                  : 'message yours'
+                              )
+                      }
                     >
                       {!text.isMine && (
                         <CMP.ChipUser
